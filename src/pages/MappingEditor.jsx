@@ -1,22 +1,34 @@
 import React from "react";
 import PrimaryButton from "../components/common/PrimaryButton";
 import MappingList from "../components/mapping/MappingList";
+import { useMappingContext } from "../contexts/MappingContext";
+import MappingWizard from "../components/mapping/MappingWizard";
 
 function MappingEditor() {
+  const { create, setCreate } = useMappingContext();
+
   return (
-    <div className="h-screen p-[24px] bg-[#F0F2F6] flex flex-col gap-6">
+    <div className="h-screen p-[24px] flex flex-col gap-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <p className="text-[24px] font-bold text-[#242424]">Mapping Editor</p>
+          <p className="text-[24px] font-bold text-[#242424]">
+            {!create ? "Mapping Editor" : "AI-Guided Control Mapping"}
+          </p>
           <p className="text-[16px] text-[#7E7E7E] mt-1">
-            Configure control mappings with a 4-step wizard
+            {!create
+              ? "Configure control mappings with a 4-step wizard"
+              : "Map obligations to data sources with AI-recommended control patterns"}
           </p>
         </div>
-        <PrimaryButton>+ Create Mapping</PrimaryButton>
+        {!create && (
+          <PrimaryButton onClick={() => setCreate(true)}>
+            + Create Mapping
+          </PrimaryButton>
+        )}
       </div>
 
-      <MappingList />
+      {!create ? <MappingList /> : <MappingWizard />}
     </div>
   );
 }

@@ -1,12 +1,21 @@
 import React from "react";
 import StatusBadge from "./StatusBadge";
 
-function Modal({ isOpen, onClose, title, description, status, children }) {
+function Modal({
+  isOpen,
+  onClose,
+  title,
+  description,
+  status,
+  bodyClassName,
+  modalClassName,
+  children,
+}) {
   if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#00000050] backdrop-blur-xs">
-      <div className="bg-white rounded-2xl w-[600px] max-w-full shadow-lg overflow-hidden">
+      <div className={`bg-white rounded-2xl w-[600px] max-w-full shadow-lg overflow-hidden ${modalClassName}`}>
         {/* Header */}
         <div
           className="flex justify-between items-start px-6 py-4"
@@ -30,7 +39,7 @@ function Modal({ isOpen, onClose, title, description, status, children }) {
         </div>
 
         {/* Content */}
-        <div className="p-6">{children}</div>
+        <div className={`p-6 ${bodyClassName}`}>{children}</div>
       </div>
     </div>
   );

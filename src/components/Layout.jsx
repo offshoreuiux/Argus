@@ -6,7 +6,7 @@ function Layout({ children }) {
   const [displaySidebar, setDisplaySidebar] = useState(true);
 
   return (
-    <div className="bg-[#0F192E]">
+    <div className="">
       <Navbar displaySidebar={displaySidebar} />
 
       <Sidebar

@@ -15,12 +15,12 @@ function OutlinedButton({
       onClick={onClick}
       disabled={disabled || loading}
       className={`
-        px-4 py-2 rounded-lg border text-base font-semibold
+        px-4 py-2 rounded-lg border text-base font-semibold 
         transition
         ${
           disabled || loading
             ? "border-gray-300 text-gray-400 cursor-not-allowed"
-            : "border-[#D4D4D4] text-[#616161] hover:bg-gray-50"
+            : "border-[#D4D4D4] text-[#616161] cursor-pointer hover:bg-gray-50"
         }
         ${className}
       `}

@@ -5,6 +5,7 @@ import SelectField from "../../common/SelectField";
 import TextareaField from "../../common/TextareaField";
 import OutlinedButton from "../../common/OutlinedButton";
 import PrimaryButton from "../../common/PrimaryButton";
+import RadioInput from "../../common/RadioInput";
 
 const TRIGGER_TYPES = [
   { label: "Organization Wide", value: "org_wide" },
@@ -25,27 +26,6 @@ const CONTROL_PATTERN_OPTIONS = [
   { label: "Formula Check", value: "formula_check" },
   { label: "TimeLiness Check", value: "timeLiness_check" },
 ];
-
-function RadioCard({ checked, label, onChange }) {
-  return (
-    <label className="flex items-center gap-2 cursor-pointer select-none">
-      <span
-        className={`w-4 h-4 rounded-full border flex items-center justify-center
-          ${checked ? "border-[#00D1BC]" : "border-[#D1D5DB]"}
-        `}
-      >
-        {checked && <span className="w-2 h-2 rounded-full bg-[#00D1BC]" />}
-      </span>
-      <span className="text-sm text-[#6B7280]">{label}</span>
-      <input
-        type="radio"
-        className="hidden"
-        checked={checked}
-        onChange={onChange}
-      />
-    </label>
-  );
-}
 
 function ObligationReviewModal({ isOpen, onClose, document, onApprove }) {
   const initial = useMemo(
@@ -131,7 +111,7 @@ function ObligationReviewModal({ isOpen, onClose, document, onApprove }) {
               </p>
               <div className="grid grid-cols-2 gap-y-3">
                 {TRIGGER_TYPES.map((t) => (
-                  <RadioCard
+                  <RadioInput
                     key={t.value}
                     label={t.label}
                     checked={form.triggerType === t.value}

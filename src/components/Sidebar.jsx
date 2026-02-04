@@ -33,13 +33,13 @@ const sidebarArr = [
   {
     id: 4,
     label: "Execution & Job History",
-    route: "/execution-&-job-history",
+    route: "/execution-history",
     icon: <ExecutionIcon />,
   },
   {
     id: 5,
     label: "Results & Exceptions",
-    route: "/results-&-exceptions",
+    route: "/results",
     icon: <ResultsIcon />,
   },
   { id: 6, label: "Audit Export", route: "/audit-export", icon: <AuditIcon /> },

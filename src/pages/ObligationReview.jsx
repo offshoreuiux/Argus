@@ -67,7 +67,7 @@ function ObligationReview() {
   const pending = statsArr[4];
 
   return (
-    <div className="h-screen p-[24px] bg-[#F0F2F6] flex flex-col gap-6">
+    <div className="h-screen p-[24px] flex flex-col gap-6">
       {/* Header */}
       <div>
         <p className="text-[24px] font-bold text-[#242424]">

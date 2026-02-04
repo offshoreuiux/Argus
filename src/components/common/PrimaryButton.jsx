@@ -16,11 +16,11 @@ function PrimaryButton({
       disabled={disabled || loading}
       className={`
         px-5 py-2 rounded-lg text-base font-semibold
-        transition cursor-pointer
+        transition 
         ${
           disabled || loading
-            ? "bg-teal-300 cursor-not-allowed"
-            : "bg-[#00D1BC] text-white hover:bg-teal-600"
+            ? "bg-teal-300 text-gray-500 cursor-not-allowed"
+            : "bg-[#00D1BC] text-white cursor-pointer hover:bg-teal-600"
         }
         ${className}
       `}
