@@ -8,7 +8,7 @@ function SelectField({
   value,
   handleChange,
   options = [],
-  placeholder = "Select option",
+  placeholder,
   disabled = false,
   className = "",
 }) {
@@ -35,7 +35,7 @@ function SelectField({
           ${className}
         `}
       >
-        <option value="">{placeholder}</option>
+        {placeholder && <option value="">{placeholder}</option>}
 
         {options.map((item) => (
           <option key={item.value} value={item.value}>

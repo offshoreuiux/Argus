@@ -15,6 +15,7 @@ export const useRegulationContext = () => {
 function RegulationProvider({ children }) {
   const [regulationModal, setRegulationModal] = useState(false);
   const [regulationDocument, setRegulationDocument] = useState(null);
+  const [regulationList, setRegulationList] = useState(null);
 
   return (
     <RegulationContext.Provider
@@ -23,6 +24,8 @@ function RegulationProvider({ children }) {
         setRegulationModal,
         regulationDocument,
         setRegulationDocument,
+        regulationList,
+        setRegulationList,
       }}
     >
       {children}

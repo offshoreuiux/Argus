@@ -1,72 +1,94 @@
-import React, { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Card from "../common/Card";
 import StatusBadge from "../common/StatusBadge";
 import InputField from "../common/InputField";
 import SelectField from "../common/SelectField";
 import Table from "../common/Table";
 import { useRegulationContext } from "../../contexts/RegulationContext";
-
-const regulations = [
-  {
-    id: 1,
-    title: "GDPR 2018",
-    version: "1.0",
-    status: "Active",
-    uploadDate: "01-10-2026",
-    obligations: 24,
-  },
-  {
-    id: 2,
-    title: "SOC2 Type II",
-    version: "1.2",
-    status: "Draft",
-    uploadDate: "05-10-2026",
-    obligations: 18,
-  },
-  {
-    id: 3,
-    title: "HIPAA",
-    version: "2.1",
-    status: "Active",
-    uploadDate: "15-12-2025",
-    obligations: 32,
-  },
-  {
-    id: 4,
-    title: "SOC2 Type II",
-    version: "1.2",
-    status: "Draft",
-    uploadDate: "05-10-2026",
-    obligations: 18,
-  },
-  {
-    id: 5,
-    title: "HIPAA",
-    version: "2.1",
-    status: "Active",
-    uploadDate: "15-12-2025",
-    obligations: 32,
-  },
-];
+import {
+  fetchRegulationListApi,
+  fetchSingleRegulationsApi,
+} from "../../../connections/apis/regulation/regulation";
+import { formatDateDMY } from "../../../helper";
 
 function RegulationLibrary() {
   const [filters, setFilters] = useState({
     search: "",
     status: "all",
-    sort: "none",
+    sort: "newest",
   });
-  const { setRegulationModal, setRegulationDocument } = useRegulationContext();
+
+  const [page, setPage] = useState(1);
+  const limit = 20;
+
+  const {
+    setRegulationModal,
+    setRegulationDocument,
+    regulationList,
+    setRegulationList,
+  } = useRegulationContext();
+
+  // ✅ API fetch with params
+  const fetchRegulationsList = async () => {
+    const res = await fetchRegulationListApi({
+      status: filters.status === "all" ? undefined : filters.status,
+      page,
+      limit,
+    });
+
+    setRegulationList(res?.data?.regulations || []);
+    // if backend gives total/pages, store it here too (optional)
+  };
+
+  // ✅ refetch when API params change
+  useEffect(() => {
+    fetchRegulationsList();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filters.status, page]);
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
+
+    // ✅ if status changes, reset to page 1
+    if (name === "status") setPage(1);
+
     setFilters((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleOpenModal = (item) => {
-    console.log("item", item);
-    setRegulationModal(true);
-    setRegulationDocument(item);
+  const handleOpenModal = async (item) => {
+    try {
+      const res = await fetchSingleRegulationsApi(item.doc_id);
+      setRegulationDocument(res.data);
+      setRegulationModal(true);
+    } catch (error) {
+      console.error(error);
+    }
   };
+
+  // ✅ Client-side search + sort (not in Swagger params)
+  const filteredRegulations = useMemo(() => {
+    const list = Array.isArray(regulationList) ? [...regulationList] : [];
+
+    // Search
+    const q = filters.search.trim().toLowerCase();
+    const searched = !q
+      ? list
+      : list.filter((r) => {
+          const title = String(r.title || "").toLowerCase();
+          const version = String(r.version || "").toLowerCase();
+          const status = String(r.status || "").toLowerCase();
+          return title.includes(q) || version.includes(q) || status.includes(q);
+        });
+
+    // Sort
+    searched.sort((a, b) => {
+      const aTime = a?.uploaded_at ? new Date(a.uploaded_at).getTime() : 0;
+      const bTime = b?.uploaded_at ? new Date(b.uploaded_at).getTime() : 0;
+      return filters.sort === "oldest" ? aTime - bTime : bTime - aTime;
+    });
+
+    return searched;
+  }, [regulationList, filters.search, filters.sort]);
 
   return (
     <Card>
@@ -94,13 +116,14 @@ function RegulationLibrary() {
               name="status"
               value={filters.status}
               handleChange={handleFilterChange}
-              placeholder="All Status"
               options={[
-                { label: "Active", value: "active" },
+                { label: "All", value: "all" },
+                { label: "Processed", value: "processed" },
                 { label: "Draft", value: "draft" },
               ]}
-              />
+            />
           </div>
+
           <div className="flex-1">
             <SelectField
               label={false}
@@ -129,23 +152,27 @@ function RegulationLibrary() {
         ]}
         containerClassName={"max-h-[600px] overflow-y-auto"}
       >
-        {regulations.map((item, index) => (
+        {filteredRegulations?.map((item, index) => (
           <tr
-            key={item.id}
+            key={item.doc_id}
             className={`
-                  text-sm border-b border-[#F1F1F1] cursor-pointer h-[64px]
-                  ${index % 2 === 0 ? "bg-white" : "bg-[#F1FFFD]"}
-                `}
+              text-sm border-b border-[#F1F1F1] cursor-pointer h-[64px]
+              ${index % 2 === 0 ? "bg-white" : "bg-[#F1FFFD]"}
+            `}
             onClick={() => handleOpenModal(item)}
           >
-            <td className="p-3 text-[#434343]">{item.id}</td>
+            <td className="p-3 text-[#434343]">
+              {(page - 1) * limit + (index + 1)}
+            </td>
             <td className="p-3 text-[#434343] font-medium">{item.title}</td>
             <td className="p-3 text-[#434343]">{item.version}</td>
             <td className="p-3 text-[#434343]">
               <StatusBadge status={item.status} />
             </td>
-            <td className="p-3 text-[#434343]">{item.uploadDate}</td>
-            <td className="p-3 text-[#434343]">{item.obligations}</td>
+            <td className="p-3 text-[#434343]">
+              {formatDateDMY(item.uploaded_at)}
+            </td>
+            <td className="p-3 text-[#434343]">{item.obligations_count}</td>
           </tr>
         ))}
       </Table>

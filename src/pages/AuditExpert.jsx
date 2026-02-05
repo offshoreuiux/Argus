@@ -1,8 +1,18 @@
 import React from "react";
 import PrimaryButton from "../components/common/PrimaryButton";
 import JobHistory from "../components/audit-expert/JobHistory";
+import { useAuditExportContext } from "../contexts/AuditExportContext";
+import CreateBundleModal from "../components/audit-expert/modal/CreateBundleModal";
+import BundleGenerationModal from "../components/audit-expert/modal/BundleGenerationModal";
 
 function AuditExpert() {
+  const {
+    createBundleModal,
+    setCreateBundleModal,
+    bundleGenModal,
+    setBundleGenModal,
+  } = useAuditExportContext();
+
   return (
     <div className="h-screen p-[24px] flex flex-col gap-6">
       {/* Header */}
@@ -14,10 +24,38 @@ function AuditExpert() {
             process
           </p>
         </div>
-        <PrimaryButton>+ Create New Bundle</PrimaryButton>
+        <PrimaryButton onClick={() => setCreateBundleModal(true)}>
+          + Create New Bundle
+        </PrimaryButton>
       </div>
 
       <JobHistory />
+
+      {/* Modal */}
+      <CreateBundleModal
+        isOpen={createBundleModal}
+        onClose={() => setCreateBundleModal(false)}
+        onSubmit={(payload) => {
+          console.log("Create bundle payload:", payload);
+
+          // ✅ close create, open generation modal
+          setCreateBundleModal(false);
+          setBundleGenModal(true);
+
+          // ✅ call API here and update progress via state later
+        }}
+      />
+
+      <BundleGenerationModal
+        isOpen={bundleGenModal}
+        onClose={() => setBundleGenModal(false)}
+        bundleName="Q4 2024 Compliance Audit Bundle"
+        progress={20}
+        currentStepLabel="2 of 8"
+        statusLabel="Collecting Data"
+        elapsed="0m 24s"
+        remaining="~5s"
+      />
     </div>
   );
 }

@@ -6,6 +6,8 @@ import TextareaField from "../../common/TextareaField";
 import OutlinedButton from "../../common/OutlinedButton";
 import PrimaryButton from "../../common/PrimaryButton";
 import RadioInput from "../../common/RadioInput";
+import { updateSingleObligationApi } from "../../../../connections/apis/obligation/obligation";
+import { formToUpdatePayload, obligationToForm } from "../../../../helper";
 
 const TRIGGER_TYPES = [
   { label: "Organization Wide", value: "org_wide" },
@@ -27,27 +29,19 @@ const CONTROL_PATTERN_OPTIONS = [
   { label: "TimeLiness Check", value: "timeLiness_check" },
 ];
 
-function ObligationReviewModal({ isOpen, onClose, document, onApprove }) {
-  const initial = useMemo(
-    () => ({
-      originalClause:
-        document?.originalClause ||
-        "Maintain detailed records of all data processing activities",
-      statement:
-        document?.statement ||
-        "Organizations must obtain explicit consent from users before processing personal data for marketing purposes",
-      entityScope: document?.entityScope || "organization_wide",
-      triggerType: document?.triggerType || "org_wide",
-      triggerDetails: document?.triggerDetails || "",
-      parameters: document?.parameters || `{"threshold": 95, "timeout": 300}`,
-      dataRequirements: document?.dataRequirements || "",
-      controlPattern: document?.controlPattern || "automated_workflow",
-      reviewNotes: document?.reviewNotes || "",
-    }),
-    [document],
-  );
-
+function ObligationReviewModal({
+  isOpen,
+  onClose,
+  document,
+  onApprove,
+  fetchObligationList,
+}) {
+  const initial = useMemo(() => obligationToForm(document), [document]);
   const [form, setForm] = useState(initial);
+  const [saving, setSaving] = useState(false);
+  console.log("document", document);
+
+  console.log("form", form);
 
   useEffect(() => {
     setForm(initial);
@@ -58,10 +52,22 @@ function ObligationReviewModal({ isOpen, onClose, document, onApprove }) {
     setForm((p) => ({ ...p, [name]: value }));
   };
 
-  const handleApprove = () => {
-    const payload = { ...form, obligationId: document?.obligationId };
-    onApprove?.(payload);
-    onClose?.();
+  const handleApprove = async () => {
+    try {
+      setSaving(true);
+
+      const obligationId = document?.current?.obligation_id;
+      const payload = formToUpdatePayload(form);
+
+      await updateSingleObligationApi(obligationId, payload);
+
+      await fetchObligationList?.();
+      onClose?.();
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -69,7 +75,7 @@ function ObligationReviewModal({ isOpen, onClose, document, onApprove }) {
       isOpen={isOpen}
       onClose={onClose}
       title={document?.title || "Document Preview"}
-      description={`Obligation ID: ${document?.obligationId}`}
+      description={`Obligation ID: ${document?.current?.obligation_id}`}
       status={document?.status}
     >
       {/* Modal header (custom like screenshot) */}
@@ -181,8 +187,13 @@ function ObligationReviewModal({ isOpen, onClose, document, onApprove }) {
           <OutlinedButton className="min-w-[110px]" onClick={onClose}>
             Cancel
           </OutlinedButton>
-          <PrimaryButton className="min-w-[110px]" onClick={handleApprove}>
-            Approve
+          <PrimaryButton
+            className="min-w-[110px]"
+            onClick={handleApprove}
+            disabled={saving}
+            loading={saving}
+          >
+            {saving ? "Saving..." : "Approve"}
           </PrimaryButton>
         </div>
       </div>

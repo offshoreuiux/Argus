@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import ThresholdIcon from "../../../assets/images/svg/threshold-check.svg";
 import FormulaIcon from "../../../assets/images/svg/formula-check.svg";
 import TimelinessIcon from "../../../assets/images/svg/timeliness-check.svg";
+import { useMappingContext } from "../../../contexts/MappingContext";
 
 const cardsArr = [
   {
@@ -25,7 +26,18 @@ const cardsArr = [
 ];
 
 function PersonalInfo() {
-  const [selectedCards, setSelectedCards] = useState([]);
+  const { wizard, updateWizard } = useMappingContext();
+  const selectedCards = useMemo(
+    () => (wizard.control_pattern_id ? [wizard.control_pattern_id] : []),
+    [wizard.control_pattern_id],
+  );
+
+  const toggle = (id) => {
+    // if you want SINGLE select:
+    updateWizard({ control_pattern_id: id });
+
+    // if you want MULTI select, store an array in context instead.
+  };
 
   return (
     <div className="p-6 flex flex-col gap-5">
@@ -56,14 +68,7 @@ function PersonalInfo() {
             <button
               key={card.id}
               type="button"
-              onClick={() =>
-                setSelectedCards(
-                  (prev) =>
-                    prev.includes(card.id)
-                      ? prev.filter((id) => id !== card.id) // deselect
-                      : [...prev, card.id], // select
-                )
-              }
+              onClick={() => toggle(card.id)}
               className={`
                 flex flex-col items-start gap-2 py-4 px-3 rounded-xl text-left transition-all
                 focus:outline-none

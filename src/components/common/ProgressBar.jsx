@@ -1,17 +1,17 @@
 import React from "react";
 
-function ProgressBar({ value }) {
+export default function ProgressBar({ value = 0, className = "" }) {
+  const safe = Number.isFinite(Number(value)) ? Number(value) : 0;
+  const percent = Math.max(0, Math.min(100, safe));
+
   return (
-    <div className="flex items-center gap-3">
-      <div className="w-[120px] h-[8px] bg-[#EAEAEA] rounded-full overflow-hidden">
+    <div className={`w-[140px] ${className}`}>
+      <div className="w-full h-[8px] bg-[#E6E6E6] rounded-full overflow-hidden">
         <div
-          className="h-full bg-[#76D1CA] rounded-full"
-          style={{ width: `${Math.min(100, Math.max(0, value))}%` }}
+          className="h-full bg-[#00D1BC] rounded-full transition-all duration-300"
+          style={{ width: `${percent}%` }}
         />
       </div>
-      <span className="text-sm text-[#4A4A4A]">{value}%</span>
     </div>
   );
 }
-
-export default ProgressBar;

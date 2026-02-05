@@ -15,7 +15,7 @@ function PrimaryButton({
       onClick={onClick}
       disabled={disabled || loading}
       className={`
-        px-5 py-2 rounded-lg text-base font-semibold
+        px-5 py-2 rounded-lg text-base font-medium
         transition 
         ${
           disabled || loading

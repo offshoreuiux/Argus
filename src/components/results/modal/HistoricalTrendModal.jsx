@@ -73,7 +73,7 @@ export default function HistoricalTrendModal({
       bodyClassName="!p-0"
       widthClass="w-[560px]"
     >
-      <div className="max-h-[70vh] overflow-y-auto px-6 py-5">
+      <div className="max-h-[60vh] overflow-y-auto px-6 py-5">
         {/* Obligation */}
         <div>
           <p className="text-[14px] font-medium text-[#7E7E7E]">

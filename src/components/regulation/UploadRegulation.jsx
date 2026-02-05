@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import Card from "../common/Card";
 import InputField from "../common/InputField";
 import SelectField from "../common/SelectField";
@@ -7,6 +7,8 @@ import PrimaryButton from "../common/PrimaryButton";
 import OutlinedButton from "../common/OutlinedButton";
 import FileUploadField from "../common/FileUploadField";
 import { useToast } from "../../contexts/ToastContext";
+import UploadProgressCard from "./UploadProgressCard";
+import { uploadRegulationApi } from "../../../connections/apis/regulation/regulation";
 
 const MAX_FILE_SIZE = 500 * 1024 * 1024; // 500MB
 const ALLOWED_TYPES = [
@@ -26,6 +28,8 @@ function UploadRegulation() {
     primaryArticles: "",
   });
   const [error, setError] = useState("");
+  const [isUploading, setIsUploading] = useState(false);
+  const [progress, setProgress] = useState(0);
 
   const handleFileChange = (file) => {
     if (!file) return;
@@ -49,7 +53,7 @@ function UploadRegulation() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault?.();
 
     const missing =
@@ -63,19 +67,70 @@ function UploadRegulation() {
       return;
     }
 
-    // If file validation error exists, block submit too
     if (error) {
       showToast("Upload Failed", error, "error");
       return;
     }
 
-    console.log("Submitting Regulation:", formData);
+    try {
+      setIsUploading(true);
+      setProgress(0);
 
-    showToast(
-      "Uploaded Successful",
-      "Regulation uploaded successfully!",
-      "success",
-    );
+      const metadataObj = {
+        title: formData.title,
+        jurisdiction: formData.jurisdiction,
+        regulationType: formData.regulationType,
+        effectiveDate: formData.effectiveDate,
+        primaryArticles: formData.primaryArticles,
+      };
+
+      const payload = {
+        file: formData.document,
+        metadata: JSON.stringify(metadataObj),
+      };
+
+      await uploadRegulationApi(payload, setProgress);
+
+      showToast(
+        "Uploaded Successful",
+        "Regulation uploaded successfully!",
+        "success",
+      );
+
+      setFormData({
+        document: null,
+        title: "",
+        jurisdiction: "",
+        regulationType: "",
+        effectiveDate: "",
+        primaryArticles: "",
+      });
+    } catch (err) {
+      console.log("upload err", err);
+      showToast(
+        "Upload Failed",
+        err?.message || "Something went wrong while uploading.",
+        "error",
+      );
+    } finally {
+      setTimeout(() => {
+        setIsUploading(false);
+        setProgress(0);
+      }, 400);
+    }
+  };
+
+  const handleCancel = () => {
+    if (isUploading) return;
+    setFormData({
+      document: null,
+      title: "",
+      jurisdiction: "",
+      regulationType: "",
+      effectiveDate: "",
+      primaryArticles: "",
+    });
+    setError("");
   };
 
   return (
@@ -83,9 +138,7 @@ function UploadRegulation() {
       <p className="text-[20px] font-bold text-[#242424] mb-4">
         Upload New Regulation
       </p>
-
       <div className="flex flex-col gap-4">
-        {/* Regulation Document */}
         <FileUploadField
           labelTitle="Regulation Document"
           required
@@ -94,9 +147,13 @@ function UploadRegulation() {
           helperText="PDF, DOC or DOCX files (max 500MB)"
           error={error && !formData.document ? error : ""}
           onFileSelect={handleFileChange}
+          onRemove={() => {
+            if (isUploading) return;
+            setFormData((p) => ({ ...p, document: null }));
+            setError("");
+          }}
         />
 
-        {/* Regulation Title */}
         <InputField
           labelTitle="Regulation Title"
           required
@@ -104,9 +161,8 @@ function UploadRegulation() {
           placeholder="e.g., GDPR 2018, HIPAA, PCI-DSS"
           value={formData.title}
           handleChange={handleChange}
+          disabled={isUploading}
         />
-
-        {/* Jurisdiction & Regulation Type */}
         <div className="grid grid-cols-2 gap-3">
           <SelectField
             labelTitle="Jurisdiction"
@@ -120,8 +176,8 @@ function UploadRegulation() {
               { label: "US", value: "US" },
               { label: "UK", value: "UK" },
             ]}
+            disabled={isUploading}
           />
-
           <SelectField
             labelTitle="Regulation Type"
             required
@@ -134,55 +190,48 @@ function UploadRegulation() {
               { label: "Security", value: "security" },
               { label: "Financial", value: "financial" },
             ]}
+            disabled={isUploading}
           />
         </div>
 
-        {/* Effective Date */}
         <InputField
           labelTitle="Effective Date"
           type="date"
           name="effectiveDate"
           value={formData.effectiveDate}
           handleChange={handleChange}
+          disabled={isUploading}
         />
 
-        {/* Primary Articles */}
         <TextareaField
           labelTitle="Primary Articles (Optional)"
           name="primaryArticles"
-          placeholder="e.g., Article 32 (Security of Processing), Article 33 (Notification of a Personal Data Breach)"
+          placeholder="e.g., Article 32..., Article 33..."
           value={formData.primaryArticles}
           handleChange={handleChange}
           rows={4}
+          disabled={isUploading}
         />
 
-        {/* Error */}
+        {isUploading && <UploadProgressCard progress={progress} />}
         {error && <p className="text-sm text-red-500">{error}</p>}
 
-        {/* Actions */}
         <div className="flex gap-4 pt-2">
           <OutlinedButton
-            className={"flex-1"}
-            onClick={() =>
-              setFormData({
-                document: null,
-                title: "",
-                jurisdiction: "",
-                regulationType: "",
-                effectiveDate: "",
-                primaryArticles: "",
-              })
-            }
+            className="flex-1"
+            onClick={handleCancel}
+            disabled={isUploading}
           >
             Cancel
           </OutlinedButton>
 
           <PrimaryButton
             type="submit"
-            className={"flex-1"}
+            className="flex-1"
             onClick={handleSubmit}
+            disabled={isUploading}
           >
-            Upload Regulation
+            {isUploading ? "Uploading..." : "Upload Regulation"}
           </PrimaryButton>
         </div>
       </div>

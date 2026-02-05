@@ -1,12 +1,9 @@
-import React from "react";
 import Card from "../components/common/Card";
 import BlueDocumentIcon from "../assets/images/svg/blue-document.svg";
 import YellowArticleIcon from "../assets/images/svg/yellow-article.svg";
 import GreenCheckIcon from "../assets/images/svg/green-check.svg";
 import StatCard from "../components/obligation/StatCard";
 import ObligationsList from "../components/obligation/ObligationsList";
-import ObligationDocumentModal from "../components/obligation/modal/ObligationDocumentModal";
-import { useObligationContext } from "../contexts/ObligationContext";
 
 const statsArr = [
   {
@@ -61,8 +58,6 @@ const statsArr = [
 ];
 
 function ObligationReview() {
-  const { obligationModal, setObligationModal, obligationDocument } =
-    useObligationContext();
   const topRow = statsArr.slice(0, 4);
   const pending = statsArr[4];
 
@@ -89,12 +84,6 @@ function ObligationReview() {
       </Card>
 
       <ObligationsList />
-
-      <ObligationDocumentModal
-        isOpen={obligationModal}
-        onClose={() => setObligationModal(false)}
-        document={obligationDocument}
-      />
     </div>
   );
 }

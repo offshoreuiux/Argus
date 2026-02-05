@@ -1,8 +1,9 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import Modal from "../../common/Modal";
 import PrimaryButton from "../../common/PrimaryButton";
 import UploadIcon from "../../../assets/images/svg/upload-file.svg";
 import SmallDocIcon from "../../../assets/images/svg/file-check.svg";
+import { formatDateDMY } from "../../../../helper";
 
 const tabsArr = [
   { label: "Documents", value: 1 },
@@ -12,6 +13,7 @@ const tabsArr = [
 
 function RegulationDocumentModal({ isOpen, onClose, document }) {
   const [activeTab, setActiveTab] = useState(tabsArr[0].value);
+  console.log("document", document);
 
   // Use API data if present, otherwise fallback demo list
   const obligations = useMemo(() => {
@@ -101,7 +103,7 @@ function RegulationDocumentModal({ isOpen, onClose, document }) {
             <div className="flex flex-col items-center justify-center bg-[#F9FBFD] border-2 border-[#D9D9D9] border-dashed rounded-lg p-10 text-center gap-4">
               <div className="flex flex-col items-center gap-2">
                 <img src={UploadIcon} alt="Upload Icon" className="w-12 h-12" />
-                <p className="text-gray-600">Document Preview</p>
+                <p className="text-gray-600">{document?.filename}</p>
                 <p className="text-gray-500 text-sm">
                   The original PDF document is stored securely on our servers.
                 </p>
@@ -120,7 +122,7 @@ function RegulationDocumentModal({ isOpen, onClose, document }) {
               <div className="bg-[#EDFFFD] h-[85px] border border-[#CDFFFA] px-4 py-2 rounded-lg flex-1">
                 <p className="text-xs text-gray-500">DATE</p>
                 <p className="text-gray-800 font-medium">
-                  {document?.date || "2026-01-10"}
+                  {formatDateDMY(document?.uploaded_at) || "2026-01-10"}
                 </p>
               </div>
             </div>
@@ -239,7 +241,7 @@ function RegulationDocumentModal({ isOpen, onClose, document }) {
       isOpen={isOpen}
       onClose={onClose}
       title={document?.title || "Document Preview"}
-      description={`Version ${document?.version} • ${document?.uploadDate}`}
+      description={`Version ${document?.version} • ${formatDateDMY(document?.uploaded_at)}`}
       status={document?.status}
     >
       {/* Match spacing + scroll */}

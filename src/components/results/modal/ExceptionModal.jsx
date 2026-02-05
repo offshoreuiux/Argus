@@ -71,7 +71,7 @@ export default function ExceptionManagementModal({
       bodyClassName="!p-0"
       widthClass="w-[520px]"
     >
-      <div className="max-h-[70vh] overflow-y-auto px-6 py-5">
+      <div className="max-h-[60vh] overflow-y-auto px-6 py-5">
         <div className="grid grid-cols-2 gap-6">
           <InfoPair label="Obligation ID" value={obligationId} />
           <InfoPair label="Detected Timestamp" value={detectedTimestamp} />

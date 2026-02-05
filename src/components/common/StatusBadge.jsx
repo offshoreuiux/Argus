@@ -4,6 +4,8 @@ function StatusBadge({ status }) {
   const statusStyles = {
     Active: "bg-[#DFFFDF] border border-[#00800033] text-[#008000]",
     Completed: "bg-[#DFFFDF] border border-[#00800033] text-[#008000]",
+    processed: "bg-[#DFFFDF] border border-[#00800033] text-[#008000]",
+    approved: "bg-[#DFFFDF] border border-[#00800033] text-[#008000]",
     Draft: "bg-[#FFF7D6] border border-[#DAB51C33] text-[#DAB51C]",
     Failed: "bg-[#FFEBEB] border border-[#E4323233] text-[#E43232]",
     Inactive: "bg-gray-100 border border-gray-300 text-gray-600",
@@ -12,7 +14,7 @@ function StatusBadge({ status }) {
   return (
     <span
       className={`
-        px-3 py-1 rounded-full text-xs font-semibold
+        px-3 py-1 rounded-full text-xs font-semibold capitalize
         ${statusStyles[status] || "bg-gray-100 text-gray-600"}
       `}
     >

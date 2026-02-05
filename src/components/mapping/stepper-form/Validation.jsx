@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import InputField from "../../common/InputField";
 import SelectField from "../../common/SelectField";
 import RadioInput from "../../common/RadioInput";
+import { useMappingContext } from "../../../contexts/MappingContext";
 
 const metricOptions = [
   { label: "Severity", value: "severity" },
@@ -18,39 +19,53 @@ const operators = [
 ];
 
 function Validation() {
-  const [form, setForm] = useState({
-    metricField: "severity",
-    thresholdValue: "",
-    operator: "gt",
+  const { wizard, updateWizard } = useMappingContext();
+
+  // local test-only state (doesn't need to be in context)
+  const [test, setTest] = useState({
     testValue: "152",
     expectedResult: "",
   });
 
-  const handleChange = (e) => {
+  const handleValidationChange = (e) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+    updateWizard({
+      validation: { ...wizard.validation, [name]: value },
+    });
+  };
+
+  const handleTestChange = (e) => {
+    const { name, value } = e.target;
+    setTest((prev) => ({ ...prev, [name]: value }));
   };
 
   const runTest = () => {
-    // Dummy logic (replace with API call)
-    const threshold = Number(form.thresholdValue);
-    const testVal = Number(form.testValue);
+    const thresholdRaw = wizard?.validation?.thresholdValue ?? "";
+    const operator = wizard?.validation?.operator ?? "gt";
 
-    if (Number.isNaN(threshold) || form.thresholdValue === "") {
-      setForm((p) => ({
+    const threshold = Number(thresholdRaw);
+    const testVal = Number(test.testValue);
+
+    if (thresholdRaw === "" || Number.isNaN(threshold)) {
+      setTest((p) => ({
         ...p,
         expectedResult: "Enter a threshold value first",
       }));
       return;
     }
 
-    let passed = false;
-    if (form.operator === "gt") passed = testVal > threshold;
-    if (form.operator === "lt") passed = testVal < threshold;
-    if (form.operator === "eq") passed = testVal === threshold;
-    if (form.operator === "neq") passed = testVal !== threshold;
+    if (test.testValue === "" || Number.isNaN(testVal)) {
+      setTest((p) => ({ ...p, expectedResult: "Enter a valid test value" }));
+      return;
+    }
 
-    setForm((p) => ({ ...p, expectedResult: passed ? "Pass" : "Fail" }));
+    let passed = false;
+    if (operator === "gt") passed = testVal > threshold;
+    if (operator === "lt") passed = testVal < threshold;
+    if (operator === "eq") passed = testVal === threshold;
+    if (operator === "neq") passed = testVal !== threshold;
+
+    setTest((p) => ({ ...p, expectedResult: passed ? "Pass" : "Fail" }));
   };
 
   return (
@@ -71,9 +86,9 @@ function Validation() {
           labelTitle="Metric Field"
           required
           name="metricField"
-          value={form.metricField}
-          handleChange={handleChange}
           placeholder="Select field"
+          value={wizard.validation.metricField}
+          handleChange={handleValidationChange}
           options={metricOptions}
         />
 
@@ -81,9 +96,9 @@ function Validation() {
           labelTitle="Threshold Value"
           required
           name="thresholdValue"
-          value={form.thresholdValue}
-          handleChange={handleChange}
           placeholder="e.g., 75"
+          value={wizard.validation.thresholdValue}
+          handleChange={handleValidationChange}
         />
       </div>
 
@@ -94,13 +109,13 @@ function Validation() {
         </p>
 
         <div className="flex items-center gap-8 flex-wrap">
-          {operators.map((op, i) => (
+          {operators.map((op) => (
             <RadioInput
-              key={i}
+              key={op.value}
               label={op.label}
-              checked={form.operator === op.value}
+              checked={wizard.validation.operator === op.value}
               onChange={() =>
-                handleChange({
+                handleValidationChange({
                   target: { name: "operator", value: op.value },
                 })
               }
@@ -120,16 +135,16 @@ function Validation() {
             labelTitle="Test Value"
             required
             name="testValue"
-            value={form.testValue}
-            handleChange={handleChange}
+            value={test.testValue}
+            handleChange={handleTestChange}
             placeholder="Enter value"
           />
 
           <InputField
             labelTitle="Expected Results"
             name="expectedResult"
-            value={form.expectedResult}
-            handleChange={handleChange}
+            value={test.expectedResult}
+            handleChange={handleTestChange}
             placeholder="Run test to see result"
             disabled
           />

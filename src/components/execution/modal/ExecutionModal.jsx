@@ -5,6 +5,8 @@ import PrimaryButton from "../../common/PrimaryButton";
 import HourglassIcon from "../../../assets/images/svg/hourglass.svg";
 import GreenCheckIcon from "../../../assets/images/svg/green-outline-check.svg";
 import RedCrossIcon from "../../../assets/images/svg/red-outline-x.svg";
+import OverallProgress from "../../common/OverallProgress";
+import SolidCheckIcon from "../../../assets/images/svg/icons/SolidCheckIcon";
 
 export default function ExecutionModal({
   isOpen,
@@ -26,7 +28,7 @@ export default function ExecutionModal({
       bodyClassName="!p-0"
     >
       {/* scrollable content area */}
-      <div className="max-h-[70vh] overflow-y-auto px-6 py-5">
+      <div className="max-h-[60vh] overflow-y-auto px-6 py-5">
         {/* top stat tiles */}
         <div className="flex gap-4">
           <StatTile label="RUN ID" value={runId} />
@@ -120,21 +122,7 @@ function InfoRow({ label, value }) {
 
 function ProgressBar({ percent = 0 }) {
   const safe = Math.max(0, Math.min(100, Number(percent) || 0));
-  return (
-    <div className="bg-[#EDFFFD] border border-[#C4EEEA] rounded-lg p-3">
-      <div className="flex items-center justify-between">
-        <p className="text-[14px] text-[#434343]">Overall Progress</p>
-        <p className="text-[14px] text-[#434343]">{safe}%</p>
-      </div>
-
-      <div className="h-[8px] bg-[#DCE5EE] rounded-full mt-3 overflow-hidden">
-        <div
-          className="h-full bg-[#00D1BC] rounded-full"
-          style={{ width: `${safe}%` }}
-        />
-      </div>
-    </div>
-  );
+  return <OverallProgress value={safe} />;
 }
 
 function MiniTile({ label, value, variant = "success" }) {
@@ -201,9 +189,7 @@ function ExecutionStepCard({ title, status, duration, progress = 0 }) {
 
         <div className="shrink-0">
           {isCompleted ? (
-            <div className="w-[22px] h-[22px] rounded-full bg-[#10B981] flex items-center justify-center">
-              <CheckIcon className="text-white" />
-            </div>
+            <SolidCheckIcon />
           ) : isInProgress ? (
             <img src={HourglassIcon} alt="" />
           ) : null}
@@ -274,22 +260,3 @@ function ClockSmallIcon() {
     </svg>
   );
 }
-
-const CheckIcon = ({ className = "" }) => (
-  <svg
-    className={className}
-    width="15"
-    height="15"
-    viewBox="0 0 24 24"
-    fill="none"
-    aria-hidden="true"
-  >
-    <path
-      d="M20 6L9 17l-5-5"
-      stroke="currentColor"
-      strokeWidth="2.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-);

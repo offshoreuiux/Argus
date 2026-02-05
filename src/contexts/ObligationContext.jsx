@@ -15,6 +15,7 @@ export const useObligationContext = () => {
 function ObligationProvider({ children }) {
   const [obligationModal, setObligationModal] = useState(false);
   const [obligationDocument, setObligationDocument] = useState(null);
+  const [obligationList, setObligationList] = useState(null);
 
   return (
     <RegulationContext.Provider
@@ -23,6 +24,8 @@ function ObligationProvider({ children }) {
         setObligationModal,
         obligationDocument,
         setObligationDocument,
+        obligationList,
+        setObligationList,
       }}
     >
       {children}

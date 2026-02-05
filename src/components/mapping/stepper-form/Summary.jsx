@@ -1,4 +1,6 @@
-import React, { useMemo, useState } from "react";
+import React, { useMemo } from "react";
+import { useMappingContext } from "../../../contexts/MappingContext";
+import SelectField from "../../common/SelectField";
 
 const CheckIcon = ({ className = "" }) => (
   <svg
@@ -21,19 +23,31 @@ const CheckIcon = ({ className = "" }) => (
 );
 
 function Summary() {
-  // Replace these with values coming from context/store later
-  const mapping = useMemo(
-    () => ({
-      controlPattern: "Threshold Check",
-      dataSource: "Threshold Check",
-      threshold: "1",
-      operator: "Greater than (>)",
-    }),
-    [],
-  );
+  const { wizard, updateWizard, submitError } = useMappingContext();
 
-  const [executionFrequency, setExecutionFrequency] = useState("daily");
-  const [executionPriority, setExecutionPriority] = useState("low");
+  const mapping = useMemo(() => {
+    const op = wizard?.validation?.operator;
+
+    const operatorLabel =
+      op === "gt"
+        ? "Greater than (>)"
+        : op === "lt"
+          ? "Less than (<)"
+          : op === "eq"
+            ? "Equal (=)"
+            : op === "neq"
+              ? "Not equal (≠)"
+              : "-";
+
+    return {
+      controlPattern: wizard?.control_pattern_id
+        ? `Pattern #${wizard.control_pattern_id}`
+        : "-",
+      dataSource: wizard?.data_source?.dataset || "-",
+      threshold: wizard?.validation?.thresholdValue || "-",
+      operator: operatorLabel,
+    };
+  }, [wizard]);
 
   const checks = [
     "Data source connectivity verified",
@@ -67,28 +81,36 @@ function Summary() {
             <div className="rounded-lg border border-[#E2E8EF] bg-[#FAFBFD] p-4">
               <div className="grid grid-cols-2 gap-x-10 gap-y-5">
                 <div>
-                  <p className="text-[14px] font-medium text-[#9B9B9B]">Control Pattern:</p>
+                  <p className="text-[14px] font-medium text-[#9B9B9B]">
+                    Control Pattern:
+                  </p>
                   <p className="text-[16px] font-semibold text-[#434343] mt-1">
                     {mapping.controlPattern}
                   </p>
                 </div>
 
                 <div>
-                  <p className="text-[14px] font-medium text-[#9B9B9B]">Data Source:</p>
+                  <p className="text-[14px] font-medium text-[#9B9B9B]">
+                    Data Source:
+                  </p>
                   <p className="text-[16px] font-semibold text-[#434343] mt-1">
                     {mapping.dataSource}
                   </p>
                 </div>
 
                 <div>
-                  <p className="text-[14px] font-medium text-[#9B9B9B]">Threshold:</p>
+                  <p className="text-[14px] font-medium text-[#9B9B9B]">
+                    Threshold:
+                  </p>
                   <p className="text-[16px] font-semibold text-[#434343] mt-1">
                     {mapping.threshold}
                   </p>
                 </div>
 
                 <div>
-                  <p className="text-[14px] font-medium text-[#9B9B9B]">Operator:</p>
+                  <p className="text-[14px] font-medium text-[#9B9B9B]">
+                    Operator:
+                  </p>
                   <p className="text-[16px] font-semibold text-[#434343] mt-1">
                     {mapping.operator}
                   </p>
@@ -108,6 +130,10 @@ function Summary() {
               </p>
             </div>
           </div>
+
+          {submitError ? (
+            <p className="text-sm text-red-600">{submitError}</p>
+          ) : null}
         </div>
 
         {/* RIGHT */}
@@ -126,38 +152,32 @@ function Summary() {
         </div>
       </div>
 
-      {/* Bottom selects */}
+      {/* Bottom selects (bind to CONTEXT, not local state) */}
       <div className="grid grid-cols-2 gap-6 mt-6">
-        <div>
-          <p className="text-[12px] font-medium text-[#111827] mb-2">
-            Execution Frequency
-          </p>
-          <select
-            value={executionFrequency}
-            onChange={(e) => setExecutionFrequency(e.target.value)}
-            className="w-full h-[42px] rounded-lg border border-[#E2E8EF] bg-[#F8FAFC] px-3 text-[13px] text-[#111827] outline-none"
-          >
-            <option value="daily">Daily</option>
-            <option value="weekly">Weekly</option>
-            <option value="monthly">Monthly</option>
-          </select>
-        </div>
+        <SelectField
+          labelTitle="Execution Frequency"
+          value={wizard?.execution_frequency || "daily"}
+          handleChange={(e) =>
+            updateWizard({ execution_frequency: e.target.value })
+          }
+          options={[
+            { label: "Daily", value: "daily" },
+            { label: "Weekly", value: "weekly" },
+            { label: "Monthly", value: "monthly" },
+          ]}
+        />
 
-        <div>
-          <p className="text-[12px] font-medium text-[#111827] mb-2">
-            Execution Priority
-          </p>
-          <select
-            value={executionPriority}
-            onChange={(e) => setExecutionPriority(e.target.value)}
-            className="w-full h-[42px] rounded-lg border border-[#E2E8EF] bg-[#F8FAFC] px-3 text-[13px] text-[#111827] outline-none"
-          >
-            <option value="low">Low</option>
-            <option value="medium">Medium</option>
-            <option value="high">High</option>
-            <option value="critical">Critical</option>
-          </select>
-        </div>
+        <SelectField
+          labelTitle="Execution Priority"
+          value={wizard?.priority || "low"}
+          handleChange={(e) => updateWizard({ priority: e.target.value })}
+          options={[
+            { label: "Low", value: "low" },
+            { label: "Medium", value: "medium" },
+            { label: "High", value: "high" },
+            { label: "Critical", value: "critical" },
+          ]}
+        />
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import InputField from "../../common/InputField";
 import SelectField from "../../common/SelectField";
+import { useMappingContext } from "../../../contexts/MappingContext";
 
 const tableArr = [
   { label: "Processing Log", value: "processing_log" },
@@ -10,16 +11,32 @@ const tableArr = [
 ];
 
 function DataConnection() {
-  const [filters, setFilters] = useState({
-    table: "",
-    filterCondition: "",
-    parameters:
-      "Columns available in selected table:\n\nid, timestamp, event_type, entity_id, status, severity, details, created_date",
-  });
+  const { wizard, updateWizard } = useMappingContext();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFilters((prev) => ({ ...prev, [name]: value }));
+
+    // map your inputs to the structure backend expects
+    if (name === "table") {
+      updateWizard({
+        data_source: {
+          ...wizard.data_source,
+          dataset: value,
+        },
+      });
+    }
+
+    if (name === "filterCondition") {
+      // if you want to keep it simple, store raw string,
+      // or parse it into filter_column/filter_value if you can.
+      // Here’s a simple approach: store raw string as filter_value.
+      updateWizard({
+        data_source: {
+          ...wizard.data_source,
+          filter_value: value,
+        },
+      });
+    }
   };
 
   return (
@@ -39,7 +56,7 @@ function DataConnection() {
           labelTitle="Select Table"
           required
           name="table"
-          value={filters.table}
+          value={wizard.data_source.dataset}
           handleChange={handleChange}
           placeholder="Select a table"
           options={tableArr}
@@ -48,9 +65,9 @@ function DataConnection() {
         <InputField
           labelTitle="Filter Conditions (Optional)"
           name="filterCondition"
-          value={filters.filterCondition}
+          value={wizard.data_source.filter_value}
           handleChange={handleChange}
-          placeholder="e.g., status=’active’ And severity > 5"
+          placeholder="e.g., status='active' AND severity > 5"
         />
       </div>
 
@@ -60,7 +77,7 @@ function DataConnection() {
         </p>
         <textarea
           name="parameters"
-          value={filters.parameters}
+          value={wizard.parameters}
           readOnly
           className="w-full h-[110px] rounded-lg border border-[#E5E7EB] p-3
              text-sm text-[#00D1BC]

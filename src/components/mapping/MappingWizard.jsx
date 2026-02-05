@@ -1,13 +1,20 @@
 import React, { useState } from "react";
 import PersonalInfo from "./stepper-form/PersonalInfo";
 import DataConnection from "./stepper-form/DataConnection";
+import Validation from "./stepper-form/Validation";
+import Summary from "./stepper-form/Summary";
+
 import Card from "../common/Card";
 import OutlinedButton from "../common/OutlinedButton";
 import PrimaryButton from "../common/PrimaryButton";
+
 import { useMappingContext } from "../../contexts/MappingContext";
 import DotIcon from "../../assets/images/svg/dot.svg";
-import Validation from "./stepper-form/Validation";
-import Summary from "./stepper-form/Summary";
+
+import {
+  createMappingApi,
+  updateMappingApi,
+} from "../../../connections/apis/mapping/mapping";
 
 const mappingArr = [
   { title: "Personal info", description: "AI recommends control pattern" },
@@ -37,19 +44,93 @@ const CheckIcon = ({ className = "" }) => (
 
 function MappingWizard() {
   const [steps, setSteps] = useState(1);
-  const { setCreate } = useMappingContext();
+  const {
+    setCreate,
+    wizard,
+    submitting,
+    setSubmitting,
+    submitError,
+    setSubmitError,
+    mode,
+    editingId,
+  } = useMappingContext();
 
   const handlePreviousStep = () => {
+    setSubmitError("");
     if (steps === 1) setCreate(false);
     else setSteps((prev) => prev - 1);
   };
 
-  const handleNextStep = () => {
-    // if already on last step, close wizard and go back to list
-    if (steps === 4) {
+  const submitMapping = async () => {
+    setSubmitting(true);
+    setSubmitError("");
+
+    try {
+      const concept_mappings = {
+        threshold_check: {
+          dataset: wizard?.data_source?.dataset,
+          column: wizard?.validation?.metricField,
+          aggregation: wizard?.data_source?.aggregation || "SUM",
+          filter_column: wizard?.data_source?.filter_column || "",
+          filter_value: wizard?.data_source?.filter_value || "",
+        },
+      };
+
+      const payload = {
+        concept_mappings,
+        execution_frequency: wizard?.execution_frequency,
+        priority: wizard?.priority,
+      };
+
+      if (mode !== "edit") {
+        await createMappingApi({
+          obligation_id: wizard?.obligation_id,
+          ...payload,
+        });
+      } else {
+        if (!editingId) {
+          throw new Error(
+            "editingId is missing. Please open mapping via Edit.",
+          );
+        }
+        await updateMappingApi(editingId, payload);
+      }
+
       setCreate(false);
+    } catch (e) {
+      setSubmitError(
+        e?.response?.data?.message || e?.message || "Failed to submit mapping",
+      );
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleNextStep = async () => {
+    setSubmitError("");
+
+    // ✅ simple per-step validation (optional but recommended)
+    if (steps === 1 && !wizard?.control_pattern_id) {
+      setSubmitError("Please select a control pattern.");
       return;
     }
+
+    if (steps === 2 && !wizard?.data_source?.dataset) {
+      setSubmitError("Please select a table.");
+      return;
+    }
+
+    if (steps === 3 && !wizard?.validation?.thresholdValue) {
+      setSubmitError("Please enter a threshold value.");
+      return;
+    }
+
+    // ✅ final step => call API
+    if (steps === 4) {
+      await submitMapping();
+      return;
+    }
+
     setSteps((prev) => Math.min(4, prev + 1));
   };
 
@@ -57,7 +138,6 @@ function MappingWizard() {
     const isCompleted = stepNumber < steps;
     const isCurrent = stepNumber === steps;
 
-    // completed: solid green with check
     if (isCompleted) {
       return (
         <div className="w-[40px] h-[40px] rounded-full bg-[#00D1BC] flex items-center justify-center">
@@ -66,18 +146,14 @@ function MappingWizard() {
       );
     }
 
-    // current: green outline with green dot
     if (isCurrent) {
       return (
         <div className="w-[40px] h-[40px] rounded-full border-2 border-[#00D1BC] flex items-center justify-center">
-          <span
-            className={`block w-[14px] h-[14px] rounded-full bg-[#00D1BC]`}
-          />
+          <span className="block w-[14px] h-[14px] rounded-full bg-[#00D1BC]" />
         </div>
       );
     }
 
-    // next: grey outline empty
     return (
       <div className="w-[40px] h-[40px] rounded-full border-2 border-[#CBD5E1] flex items-center justify-center">
         <div className="w-[16px] h-[16px] rounded-full bg-transparent" />
@@ -115,10 +191,10 @@ function MappingWizard() {
   const getCardClasses = (index) => {
     const stepNumber = index + 1;
     const isCompleted = stepNumber < steps;
-    if (isCompleted) {
-      return "bg-[#EEFFF3] border border-[#92D0A8]";
-    }
-    return "bg-[#EFF6FF] border border-[#CBDDF4]";
+
+    return isCompleted
+      ? "bg-[#EEFFF3] border border-[#92D0A8]"
+      : "bg-[#EFF6FF] border border-[#CBDDF4]";
   };
 
   return (
@@ -165,16 +241,32 @@ function MappingWizard() {
         {steps === 3 && <Validation />}
         {steps === 4 && <Summary />}
 
+        {/* show error above footer buttons */}
+        {submitError ? (
+          <div className="px-6 pt-4">
+            <p className="text-sm text-red-600">{submitError}</p>
+          </div>
+        ) : null}
+
         <div className="p-6 bg-white flex items-center justify-between gap-4 rounded-b-2xl border-t border-[#E2E8EF]">
           <OutlinedButton
             className="min-w-[150px]"
             onClick={handlePreviousStep}
+            disabled={submitting}
           >
             {steps === 1 ? "Cancel" : "Back"}
           </OutlinedButton>
 
-          <PrimaryButton className="min-w-[150px]" onClick={handleNextStep}>
-            {steps === 4 ? "Activate Mapping" : "Next"}
+          <PrimaryButton
+            className="min-w-[150px]"
+            onClick={handleNextStep}
+            disabled={submitting}
+          >
+            {steps === 4
+              ? submitting
+                ? "Activating..."
+                : "Activate Mapping"
+              : "Next"}
           </PrimaryButton>
         </div>
       </Card>

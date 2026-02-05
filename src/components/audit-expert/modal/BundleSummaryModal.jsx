@@ -1,6 +1,7 @@
 import React, { useMemo } from "react";
 import Modal from "../../common/Modal";
-import PrimaryButton from "../../common/PrimaryButton";
+import OutlinedButton from "../../common/OutlinedButton";
+import DownloadIcon from "../../../assets/images/svg/download.svg";
 
 export default function BundleSummaryModal({
   isOpen,
@@ -35,57 +36,52 @@ export default function BundleSummaryModal({
       <div className="px-6 py-5">
         {/* Top green card */}
         <div className="border border-[#C4EEEA] bg-[#EDFFFD] rounded-lg p-4">
-          <p className="text-[12px] text-[#7E7E7E]">Bundle Name</p>
-          <p className="text-[14px] font-semibold text-[#00B9A7] mt-1">
+          <p className="text-[14px] font-medium text-[#7E7E7E]">Bundle Name</p>
+          <p className="text-[16px] font-semibold text-[#00D1BC] mt-1">
             {safe.bundleName || "-"}
           </p>
         </div>
 
         {/* Download button */}
-        <button
-          type="button"
+        <OutlinedButton
           onClick={() => onDownloadBundle?.(safe)}
-          className="mt-4 w-full h-[44px] rounded-lg border border-[#CFE9FF]
-            text-[#00D1BC] font-medium flex items-center justify-center gap-2 bg-white"
+          className="w-full !border-[#00D1BC] !text-[#00D1BC] text-[14px] mt-5"
         >
-          <DownloadIcon />
-          Download Full Bundle
-        </button>
+          <span className="flex items-center justify-center gap-2">
+            <img src={DownloadIcon} alt="" /> Download Full Bundle
+          </span>
+        </OutlinedButton>
 
         {/* Summary Details */}
-        <p className="text-[14px] font-medium text-[#434343] mt-5">
+        <p className="text-[16px] font-semibold text-[#434343] mt-5">
           Summary Details
         </p>
 
-        <div className="mt-3 border border-[#E7EEF7] rounded-lg bg-[#F9FBFD] overflow-hidden">
+        <div className="mt-3 p-4 border border-[#E7EEF7] rounded-lg bg-[#F9FBFD] overflow-hidden">
           <SummaryRow
             title="Executive Summary"
             desc="Comprehensive audit bundle containing all execution results, control validations, and exception management records for regulatory compliance reporting."
+            className={"pt-0"}
           />
-
           <Divider />
-
           <SummaryRow
             title="Regulatory Scope"
             desc={`Regulations: ${regs} | Coverage Period: ${coveragePeriod}`}
           />
-
           <Divider />
-
           <SummaryRow
             title="Statistics"
             desc={`Executions: ${safe.execution ?? "-"} | Obligations: ${
               safe.obligations ?? "-"
             } | Generated: ${generatedText}`}
           />
-
           <Divider />
-
           <SummaryRow
             title="Bundle Integrity"
             desc={`Hash: ${hashShort} | Signature: Verified ✓ | Size: ${
               safe.size || "-"
             }`}
+            className={"pb-0"}
           />
         </div>
       </div>
@@ -93,9 +89,9 @@ export default function BundleSummaryModal({
   );
 }
 
-function SummaryRow({ title, desc }) {
+function SummaryRow({ title, desc, className }) {
   return (
-    <div className="px-4 py-3">
+    <div className={`py-3 ${className}`}>
       <p className="text-[12px] font-medium text-[#242424]">{title}</p>
       <p className="text-[11px] text-[#7E7E7E] mt-1 leading-5">{desc}</p>
     </div>
@@ -104,30 +100,4 @@ function SummaryRow({ title, desc }) {
 
 function Divider() {
   return <div className="h-[1px] bg-[#E7EEF7]" />;
-}
-
-function DownloadIcon() {
-  return (
-    <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
-      <path
-        d="M12 3v10"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-      <path
-        d="M8 11l4 4 4-4"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M4 17v3h16v-3"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-      />
-    </svg>
-  );
 }
