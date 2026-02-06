@@ -1,12 +1,49 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Card from "../common/Card";
 import PrimaryButton from "../common/PrimaryButton";
 import OutlinedButton from "../common/OutlinedButton";
 import DownloadIcon from "../../assets/images/svg/white-download.svg";
 import ExcelIcon from "../../assets/images/svg/excel.svg";
 import DocumentIcon from "../../assets/images/svg/grey-document.svg";
+import { executionRunApi } from "../../../connections/apis/execution/execution";
+import { fetchObligationListApi } from "../../../connections/apis/obligation/obligation";
+import { useObligationContext } from "../../contexts/ObligationContext";
 
 function ExecutionSummary({ onDownload, onExport, onAuditTrail }) {
+  const [stats, setStats] = useState();
+  const { obligationList, setObligationList } = useObligationContext();
+  console.log("obligationList", obligationList);
+
+  const executionSummary = async () => {
+    try {
+      const obIds = obligationList?.map((c) => c.obligation_id);
+      const payload = {
+        institution_id: "DEMO_BANK",
+        execution_date: "string",
+        obligation_ids: obIds,
+        mode: "batch",
+      };
+      const res = await executionRunApi(payload);
+      console.log("res", res);
+    } catch (error) {
+      console.log("error", error);
+    }
+  };
+
+  const fetchObligationList = async () => {
+    try {
+      const res = await fetchObligationListApi();
+      setObligationList(res.data?.obligations);
+    } catch (error) {
+      console.log("error", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchObligationList();
+    executionSummary();
+  }, []);
+
   const statsArr = [
     { label: "Institution", value: "Bank A" },
     { label: "Execution Date", value: "20-01-2024" },

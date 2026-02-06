@@ -8,6 +8,7 @@ import EditIcon from "../../assets/images/svg/edit.svg";
 import HistoryIcon from "../../assets/images/svg/history.svg";
 import CircleMinusIcon from "../../assets/images/svg/circle-minus.svg";
 import {
+  deactivateMappingApi,
   fetchMappingListApi,
   fetchSingleMappingApi,
 } from "../../../connections/apis/mapping/mapping";
@@ -177,6 +178,15 @@ function MappingList() {
     }
   };
 
+  const deactiveMappingList = async (mapping_id) => {
+    try {
+      await deactivateMappingApi(mapping_id);
+      fetchMappingList();
+    } catch (error) {
+      console.log("error", error);
+    }
+  };
+
   useEffect(() => {
     fetchMappingList();
   }, [filters.status]);
@@ -292,7 +302,9 @@ function MappingList() {
                 <ActionIconBtn onClick={() => console.log("rerun", item)}>
                   <img src={HistoryIcon} alt="" />
                 </ActionIconBtn>
-                <ActionIconBtn onClick={() => console.log("view", item)}>
+                <ActionIconBtn
+                  onClick={() => deactiveMappingList(item.mapping_id)}
+                >
                   <img src={CircleMinusIcon} alt="" />
                 </ActionIconBtn>
               </div>

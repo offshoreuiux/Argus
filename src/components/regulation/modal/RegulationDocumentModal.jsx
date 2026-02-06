@@ -4,6 +4,7 @@ import PrimaryButton from "../../common/PrimaryButton";
 import UploadIcon from "../../../assets/images/svg/upload-file.svg";
 import SmallDocIcon from "../../../assets/images/svg/file-check.svg";
 import { formatDateDMY } from "../../../../helper";
+import { fetchExtractedObligationsApi } from "../../../../connections/apis/regulation/regulation";
 
 const tabsArr = [
   { label: "Documents", value: 1 },
@@ -13,7 +14,24 @@ const tabsArr = [
 
 function RegulationDocumentModal({ isOpen, onClose, document }) {
   const [activeTab, setActiveTab] = useState(tabsArr[0].value);
+  const [obligationsList, setObligationsList] = useState([]);
   console.log("document", document);
+  console.log("activeTab", activeTab);
+
+  const fetchExtractedObligationsList = async () => {
+    try {
+      const res = await fetchExtractedObligationsApi(document.doc_id);
+      setObligationsList(res.data);
+    } catch (error) {
+      console.log("error", error);
+    }
+  };
+
+  useEffect(() => {
+    if (activeTab === 2) {
+      fetchExtractedObligationsList();
+    }
+  }, [activeTab]);
 
   // Use API data if present, otherwise fallback demo list
   const obligations = useMemo(() => {

@@ -1,29 +1,47 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import Modal from "../../common/Modal";
 import OutlinedButton from "../../common/OutlinedButton";
 import DownloadIcon from "../../../assets/images/svg/download.svg";
+import { downloadSingleAuditBundleApi } from "../../../../connections/apis/audit/audit";
+import { downloadBlobResponse } from "../../../../helper";
 
-export default function BundleSummaryModal({
-  isOpen,
-  onClose,
-  bundle,
-  onDownloadBundle,
-}) {
+export default function BundleSummaryModal({ isOpen, onClose, bundle }) {
   const safe = bundle || {};
+  const [downloading, setDownloading] = useState(false);
 
   const coveragePeriod = useMemo(() => {
-    // If your API sends separate start/end, use them.
-    // Here we reuse `period` which is: "01-10-2023 to 31-12-2023"
     return safe.period || "-";
   }, [safe]);
 
   const generatedText = useMemo(() => {
-    // "15-01-2024 14:30" -> "2024-01-15 14:30" if you want.
     return safe.generated || "-";
   }, [safe]);
 
   const regs = safe.regulations || "-";
   const hashShort = safe.hash ? `${safe.hash.slice(0, 8)}...` : "-";
+
+  const handleDownloadFullBundle = async () => {
+    const bundleId = safe?.bundle_id || safe?.bundleId;
+    if (!bundleId) return;
+
+    try {
+      setDownloading(true);
+
+      const res = await downloadSingleAuditBundleApi(bundleId);
+
+      const safeName = (
+        safe?.bundle_name ||
+        safe?.bundleName ||
+        "audit-bundle"
+      ).replace(/[^\w\-]+/g, "_");
+
+      downloadBlobResponse(res, `${safeName}.zip`);
+    } catch (error) {
+      console.log("download error", error);
+    } finally {
+      setDownloading(false);
+    }
+  };
 
   return (
     <Modal
@@ -38,17 +56,19 @@ export default function BundleSummaryModal({
         <div className="border border-[#C4EEEA] bg-[#EDFFFD] rounded-lg p-4">
           <p className="text-[14px] font-medium text-[#7E7E7E]">Bundle Name</p>
           <p className="text-[16px] font-semibold text-[#00D1BC] mt-1">
-            {safe.bundleName || "-"}
+            {safe.bundle_name || safe.bundleName || "-"}
           </p>
         </div>
 
         {/* Download button */}
         <OutlinedButton
-          onClick={() => onDownloadBundle?.(safe)}
-          className="w-full !border-[#00D1BC] !text-[#00D1BC] text-[14px] mt-5"
+          onClick={handleDownloadFullBundle}
+          disabled={downloading}
+          className="w-full !border-[#00D1BC] !text-[#00D1BC] text-[14px] mt-5 disabled:opacity-60"
         >
           <span className="flex items-center justify-center gap-2">
-            <img src={DownloadIcon} alt="" /> Download Full Bundle
+            <img src={DownloadIcon} alt="" />
+            {downloading ? "Downloading..." : "Download Full Bundle"}
           </span>
         </OutlinedButton>
 

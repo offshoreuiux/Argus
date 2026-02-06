@@ -117,7 +117,6 @@ function ControlResults() {
                   { label: "Passed", value: "pass" },
                   { label: "Failed", value: "fail" },
                 ]}
-                placeholder="All"
               />
             </div>
           </div>

@@ -7,11 +7,19 @@ import PrimaryButton from "../../common/PrimaryButton";
 import CheckboxInput from "../../common/CheckboxInput";
 import RadioInput from "../../common/RadioInput";
 import TextareaField from "../../common/TextareaField";
+import { createAuditBundleApi } from "../../../../connections/apis/audit/audit";
+
+const REGULATION_IDS_MAP = {
+  gdpr: "GDPR",
+  pci: "PCI_DSS",
+  hipaa: "HIPAA",
+  soc2: "SOC2",
+};
 
 export default function CreateBundleModal({ isOpen, onClose, onSubmit }) {
   const [form, setForm] = useState({
     bundleName: "",
-    institution: "Bank A",
+    institution: "DEMO_BANK",
     generatedFor: "",
     dateFrom: "",
     dateTo: "",
@@ -31,24 +39,24 @@ export default function CreateBundleModal({ isOpen, onClose, onSubmit }) {
       traceabilityMatrix: false,
     },
 
-    exportFormat: "", // "pdf" | "excel" | "zip"
+    exportFormat: "", // "pdf" | "excel" | "zip"  (backend doesn't need this yet)
     notes: "",
   });
 
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
   const institutionOptions = useMemo(
-    () => [
-      { label: "Bank A", value: "Bank A" },
-      { label: "Bank B", value: "Bank B" },
-      { label: "Bank C", value: "Bank C" },
-    ],
+    () => [{ label: "DEMO BANK", value: "DEMO_BANK" }],
     [],
   );
 
   const generatedForOptions = useMemo(
     () => [
-      { label: "External Auditor", value: "external_auditor" },
-      { label: "Board of Directors", value: "board" },
-      { label: "Regulator", value: "regulator" },
+      { label: "External Auditor", value: "External Auditor" },
+      { label: "Board of Directors", value: "Board of Directors" },
+      { label: "Regulator", value: "Regulator" },
+      { label: "Internal Review", value: "Internal Review" },
     ],
     [],
   );
@@ -80,9 +88,70 @@ export default function CreateBundleModal({ isOpen, onClose, onSubmit }) {
   const estimatedSize = "~3.5 MB";
   const estimatedTime = "~2-3 minutes";
 
-  const handleSubmit = () => {
-    onSubmit?.(form);
-    onClose?.();
+  const getSelectedRegulationIds = () => {
+    const keys = Object.entries(form.regulations)
+      .filter(([, v]) => v)
+      .map(([k]) => k);
+
+    const ids = keys.map((k) => REGULATION_IDS_MAP[k]).filter(Boolean);
+
+    return Array.from(new Set(ids));
+  };
+
+  const handleSubmit = async () => {
+    try {
+      setError("");
+
+      // ✅ basic validation
+      if (!form.bundleName.trim()) return setError("Bundle name is required.");
+      if (!form.institution) return setError("Institution is required.");
+      if (!form.generatedFor) return setError("Generated for is required.");
+      if (!form.dateFrom) return setError("Date range from is required.");
+      if (!form.dateTo) return setError("Date range to is required.");
+
+      const regulation_ids = getSelectedRegulationIds();
+      if (!regulation_ids.length) {
+        return setError("Please select at least one regulation.");
+      }
+
+      setLoading(true);
+
+      // ✅ Map your UI include fields to backend booleans
+      // Backend expects: include_obligations, include_mappings, include_executions, include_audit_events
+      // (Your UI has more granular checkboxes; we map them sensibly)
+      const include_executions =
+        form.include.executionSummary ||
+        form.include.controlResultsEvidence ||
+        form.include.complianceStatistics ||
+        form.include.exceptionsRemediation ||
+        form.include.traceabilityMatrix;
+
+      const payload = {
+        bundle_name: form.bundleName,
+        institution_id: form.institution,
+        date_range_from: form.dateFrom,
+        date_range_to: form.dateTo,
+        regulation_ids,
+        include_obligations: true, // or map to a checkbox if you add one
+        include_mappings: !!form.include.traceabilityMatrix,
+        include_executions,
+        include_audit_events: true, // you can add a checkbox later
+        generated_for: form.generatedFor,
+      };
+
+      const res = await createAuditBundleApi(payload);
+
+      // ✅ callback to parent if you need
+      onSubmit?.({ uiForm: form, apiPayload: payload, response: res?.data });
+
+      onClose?.();
+    } catch (e) {
+      setError(
+        e?.response?.data?.message || e?.message || "Failed to create bundle.",
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -94,6 +163,12 @@ export default function CreateBundleModal({ isOpen, onClose, onSubmit }) {
       widthClass="w-[640px]"
     >
       <div className="max-h-[60vh] overflow-y-auto px-6 py-5">
+        {error ? (
+          <div className="mb-4 border border-[#F9BEBE] bg-[#FFEBEB] rounded-lg p-3">
+            <p className="text-[13px] text-[#B42318]">{error}</p>
+          </div>
+        ) : null}
+
         {/* Bundle Name */}
         <InputField
           labelTitle="Bundle Name"
@@ -122,7 +197,6 @@ export default function CreateBundleModal({ isOpen, onClose, onSubmit }) {
             value={form.generatedFor}
             handleChange={update}
             options={generatedForOptions}
-            placeholder="External Auditor"
           />
         </div>
 
@@ -216,7 +290,7 @@ export default function CreateBundleModal({ isOpen, onClose, onSubmit }) {
           </div>
         </div>
 
-        {/* Export Format */}
+        {/* Export Format (UI only for now) */}
         <div className="mt-5">
           <p className="text-sm font-medium text-[#242424]">
             Export Format<span className="text-red-500 ml-1">*</span>
@@ -279,12 +353,20 @@ export default function CreateBundleModal({ isOpen, onClose, onSubmit }) {
 
       {/* Footer */}
       <div className="px-6 py-4 border-t border-[#E2E8EF] flex items-center justify-end gap-3">
-        <OutlinedButton onClick={onClose} className="min-w-[110px]">
+        <OutlinedButton
+          onClick={onClose}
+          className="min-w-[110px]"
+          disabled={loading}
+        >
           Cancel
         </OutlinedButton>
 
-        <PrimaryButton onClick={handleSubmit} className="min-w-[150px]">
-          Generate Bundle
+        <PrimaryButton
+          onClick={handleSubmit}
+          className="min-w-[150px]"
+          disabled={loading}
+        >
+          {loading ? "Generating..." : "Generate Bundle"}
         </PrimaryButton>
       </div>
     </Modal>

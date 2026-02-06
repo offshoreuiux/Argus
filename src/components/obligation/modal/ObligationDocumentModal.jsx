@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState, useRef } from "react";
 import Modal from "../../common/Modal";
 import InputField from "../../common/InputField";
 import SelectField from "../../common/SelectField";
@@ -6,8 +6,11 @@ import TextareaField from "../../common/TextareaField";
 import OutlinedButton from "../../common/OutlinedButton";
 import PrimaryButton from "../../common/PrimaryButton";
 import RadioInput from "../../common/RadioInput";
-import { updateSingleObligationApi } from "../../../../connections/apis/obligation/obligation";
-import { formToUpdatePayload, obligationToForm } from "../../../../helper";
+import {
+  approveSingleObligationApi,
+  fetchControlPatternsApi,
+} from "../../../../connections/apis/obligation/obligation";
+import { obligationToForm } from "../../../../helper";
 
 const TRIGGER_TYPES = [
   { label: "Organization Wide", value: "org_wide" },
@@ -39,27 +42,54 @@ function ObligationReviewModal({
   const initial = useMemo(() => obligationToForm(document), [document]);
   const [form, setForm] = useState(initial);
   const [saving, setSaving] = useState(false);
-  console.log("document", document);
+  const [controlPanelList, setControlPanelList] = useState([]);
 
-  console.log("form", form);
+  const [errors, setErrors] = useState({ reviewNotes: "" });
+  const reviewNotesRef = useRef(null);
 
   useEffect(() => {
     setForm(initial);
+    setErrors({ reviewNotes: "" });
   }, [initial]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((p) => ({ ...p, [name]: value }));
+
+    // clear error as user types
+    if (name === "reviewNotes") {
+      setErrors((p) => ({ ...p, reviewNotes: "" }));
+    }
+  };
+
+  const validate = () => {
+    const notes = String(form.reviewNotes || "").trim();
+    const nextErrors = {
+      reviewNotes: notes ? "" : "Review notes is required",
+    };
+    setErrors(nextErrors);
+
+    if (!notes) {
+      // focus textarea
+      setTimeout(() => reviewNotesRef.current?.focus?.(), 0);
+      return false;
+    }
+    return true;
   };
 
   const handleApprove = async () => {
+    if (!validate()) return;
+
     try {
       setSaving(true);
 
       const obligationId = document?.current?.obligation_id;
-      const payload = formToUpdatePayload(form);
 
-      await updateSingleObligationApi(obligationId, payload);
+      await approveSingleObligationApi(obligationId, {
+        status: document?.current?.status,
+        review_notes: form.reviewNotes,
+        reviewed_by: "user",
+      });
 
       await fetchObligationList?.();
       onClose?.();
@@ -70,6 +100,19 @@ function ObligationReviewModal({
     }
   };
 
+  const fetchControlPatterns = async () => {
+    try {
+      const res = await fetchControlPatternsApi();
+      setControlPanelList(res.data);
+    } catch (error) {
+      console.log("error", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchControlPatterns();
+  }, []);
+
   return (
     <Modal
       isOpen={isOpen}
@@ -78,12 +121,9 @@ function ObligationReviewModal({
       description={`Obligation ID: ${document?.current?.obligation_id}`}
       status={document?.status}
     >
-      {/* Modal header (custom like screenshot) */}
       <div className="w-full">
-        {/* Body scroll */}
         <div className="max-h-[500px] overflow-y-auto pr-1">
           <div className="py-4 flex flex-col gap-4">
-            {/* Original Clause */}
             <InputField
               labelTitle="Original Clause"
               name="originalClause"
@@ -91,7 +131,6 @@ function ObligationReviewModal({
               handleChange={handleChange}
             />
 
-            {/* Obligation Statement */}
             <TextareaField
               labelTitle="Obligation Statement"
               name="statement"
@@ -100,7 +139,6 @@ function ObligationReviewModal({
               rows={3}
             />
 
-            {/* Entity Scope */}
             <SelectField
               labelTitle="Entity Scope"
               name="entityScope"
@@ -110,7 +148,6 @@ function ObligationReviewModal({
               options={ENTITY_SCOPE_OPTIONS}
             />
 
-            {/* Trigger Type */}
             <div>
               <p className="text-sm font-medium text-[#111827] mb-2">
                 Trigger Type
@@ -129,7 +166,6 @@ function ObligationReviewModal({
               </div>
             </div>
 
-            {/* Trigger Details */}
             <InputField
               labelTitle="Trigger Details"
               name="triggerDetails"
@@ -138,7 +174,6 @@ function ObligationReviewModal({
               placeholder="e.g., Monthly or first Monday"
             />
 
-            {/* Parameters (JSON) */}
             <div>
               <p className="text-sm font-medium text-[#111827] mb-2">
                 Parameters (JSON)
@@ -151,7 +186,6 @@ function ObligationReviewModal({
               />
             </div>
 
-            {/* Data Requirements */}
             <InputField
               labelTitle="Data Requirements"
               name="dataRequirements"
@@ -160,33 +194,57 @@ function ObligationReviewModal({
               placeholder="Specify required data sources and fields"
             />
 
-            {/* Suggested Control Pattern */}
-            <SelectField
-              labelTitle="Suggested Control Pattern"
-              name="controlPattern"
-              value={form.controlPattern}
-              handleChange={handleChange}
-              placeholder="Select pattern"
-              options={CONTROL_PATTERN_OPTIONS}
-            />
+            <div className="flex flex-col gap-1">
+              <label className="text-sm font-medium text-[#242424]">
+                Suggested Control Pattern
+              </label>
+              <select
+                name="controlPattern"
+                value={form.controlPattern}
+                onChange={handleChange}
+                className="
+                  w-full h-[46px] px-3 rounded-lg text-sm
+                  border border-[#E2E8EF] bg-[#F9FBFD]
+                  outline-none transition
+                  focus:border-teal-500
+                  disabled:bg-gray-100 disabled:cursor-not-allowed"
+              >
+                <option value="">Select pattern</option>
+                {controlPanelList.map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {item.id?.split("_")?.join(" ")}
+                  </option>
+                ))}
+              </select>
+            </div>
 
-            {/* Review Notes */}
-            <TextareaField
-              labelTitle="Review Notes"
-              name="reviewNotes"
-              value={form.reviewNotes}
-              handleChange={handleChange}
-              placeholder="Add any notes or comments about this obligation..."
-              rows={3}
-            />
+            {/* ✅ Review Notes required */}
+            <div>
+              <TextareaField
+                labelTitle="Review Notes"
+                name="reviewNotes"
+                required
+                value={form.reviewNotes}
+                handleChange={handleChange}
+                placeholder="Add any notes or comments about this obligation..."
+                rows={3}
+                // if your TextareaField supports ref passing:
+                ref={reviewNotesRef}
+              />
+              {errors.reviewNotes ? (
+                <p className="text-sm text-red-500 mt-1">
+                  {errors.reviewNotes}
+                </p>
+              ) : null}
+            </div>
           </div>
         </div>
 
-        {/* Footer actions (sticky like screenshot) */}
         <div className="flex justify-end gap-3 pt-4 border-t border-[#EAEAEA]">
           <OutlinedButton className="min-w-[110px]" onClick={onClose}>
             Cancel
           </OutlinedButton>
+
           <PrimaryButton
             className="min-w-[110px]"
             onClick={handleApprove}

@@ -49,12 +49,17 @@ export const approveSingleObligationApi = (obligation_id, payload) => {
   }
 
   if (!payload || typeof payload !== "object") {
-    throw new Error("payload is required and must be an object");
+    throw new Error("payload is required");
   }
 
   return apiURL.post(`obligations/${obligation_id}/approve`, payload, {
     headers: {
       "Content-Type": "application/json",
+      Accept: "application/json",
     },
   });
+};
+
+export const fetchControlPatternsApi = () => {
+  return apiURL.get(`control-patterns`);
 };

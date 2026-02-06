@@ -39,3 +39,44 @@ export const fetchSingleRegulationsApi = (doc_id) => {
 
   return apiURL.get(`regulations/${doc_id}`);
 };
+
+export const normalizeRegulationApi = (doc_id) => {
+  if (!doc_id) {
+    throw new Error("doc_id is required");
+  }
+
+  return apiURL.post(`regulations/${doc_id}/normalize`, null, {
+    headers: {
+      Accept: "application/json",
+    },
+  });
+};
+
+export const extractObligationsApi = (doc_id, payload) => {
+  if (!doc_id) {
+    throw new Error("doc_id is required");
+  }
+
+  if (!payload || typeof payload !== "object") {
+    throw new Error("payload is required");
+  }
+
+  return apiURL.post(`regulations/${doc_id}/extract`, payload, {
+    headers: {
+      "Content-Type": "application/json",
+      Accept: "application/json",
+    },
+  });
+};
+
+export const fetchExtractedObligationsApi = (doc_id) => {
+  if (!doc_id) {
+    throw new Error("doc_id is required");
+  }
+
+  return apiURL.get(`regulations/${doc_id}/extracted`, {
+    headers: {
+      Accept: "application/json",
+    },
+  });
+};

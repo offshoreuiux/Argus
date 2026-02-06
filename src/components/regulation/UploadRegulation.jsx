@@ -8,7 +8,11 @@ import OutlinedButton from "../common/OutlinedButton";
 import FileUploadField from "../common/FileUploadField";
 import { useToast } from "../../contexts/ToastContext";
 import UploadProgressCard from "./UploadProgressCard";
-import { uploadRegulationApi } from "../../../connections/apis/regulation/regulation";
+import {
+  extractObligationsApi,
+  normalizeRegulationApi,
+  uploadRegulationApi,
+} from "../../../connections/apis/regulation/regulation";
 
 const MAX_FILE_SIZE = 500 * 1024 * 1024; // 500MB
 const ALLOWED_TYPES = [
@@ -89,11 +93,33 @@ function UploadRegulation() {
         metadata: JSON.stringify(metadataObj),
       };
 
-      await uploadRegulationApi(payload, setProgress);
+      // ✅ 1) UPLOAD (progress will update via setProgress)
+      const uploadRes = await uploadRegulationApi(payload, setProgress);
+      const doc_id = uploadRes?.data?.doc_id;
+
+      if (!doc_id) {
+        throw new Error("doc_id not found in upload response");
+      }
+      setProgress(100);
+
+      const normRes = await normalizeRegulationApi(doc_id);
+      const normalized = normRes?.data;
+
+      const article_ids = Array.isArray(normalized?.articles)
+        ? normalized.articles.map((a) => a?.article_id || a?.id).filter(Boolean)
+        : [];
+
+      const extractPayload = {
+        article_ids: article_ids.length ? article_ids : ["string"], // fallback if backend requires non-empty
+        source_doc_version: "unknown",
+        version: "v1",
+      };
+
+      await extractObligationsApi(doc_id, extractPayload);
 
       showToast(
         "Uploaded Successful",
-        "Regulation uploaded successfully!",
+        "Regulation uploaded, normalized, and obligations extracted successfully!",
         "success",
       );
 
@@ -106,10 +132,10 @@ function UploadRegulation() {
         primaryArticles: "",
       });
     } catch (err) {
-      console.log("upload err", err);
+      console.log("upload/normalize/extract err", err);
       showToast(
-        "Upload Failed",
-        err?.message || "Something went wrong while uploading.",
+        "Process Failed",
+        err?.response?.data?.message || err?.message || "Something went wrong.",
         "error",
       );
     } finally {

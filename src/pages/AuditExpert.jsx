@@ -31,18 +31,13 @@ function AuditExpert() {
 
       <JobHistory />
 
-      {/* Modal */}
       <CreateBundleModal
         isOpen={createBundleModal}
         onClose={() => setCreateBundleModal(false)}
         onSubmit={(payload) => {
           console.log("Create bundle payload:", payload);
-
-          // ✅ close create, open generation modal
           setCreateBundleModal(false);
           setBundleGenModal(true);
-
-          // ✅ call API here and update progress via state later
         }}
       />
 

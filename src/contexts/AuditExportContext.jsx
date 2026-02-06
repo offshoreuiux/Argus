@@ -17,6 +17,7 @@ function AuditExportProvider({ children }) {
   const [selectedBundle, setSelectedBundle] = useState(null);
   const [createBundleModal, setCreateBundleModal] = useState(false);
   const [bundleGenModal, setBundleGenModal] = useState(false);
+  const [auditList, setAuditList] = useState([]);
 
   return (
     <AuditExportContext.Provider
@@ -29,6 +30,8 @@ function AuditExportProvider({ children }) {
         setCreateBundleModal,
         bundleGenModal,
         setBundleGenModal,
+        auditList,
+        setAuditList,
       }}
     >
       {children}

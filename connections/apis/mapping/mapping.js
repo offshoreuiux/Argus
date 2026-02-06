@@ -65,3 +65,18 @@ export const fetchSingleMappingApi = (mapping_id) => {
 
   return apiURL.get(`mappings/${mapping_id}`);
 };
+
+export const deactivateMappingApi = (mapping_id, reason = "") => {
+  if (!mapping_id) {
+    throw new Error("mapping_id is required");
+  }
+
+  return apiURL.post(`mappings/${mapping_id}/deactivate`, null, {
+    params: {
+      ...(reason ? { reason } : {}),
+    },
+    headers: {
+      "Content-Type": "application/json",
+    },
+  });
+};

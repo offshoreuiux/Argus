@@ -28,10 +28,23 @@ function ExecutionProvider({ children }) {
       quick: false,
     },
   });
-  
+  const [executionList, setExecutionList] = useState([]);
+  const [executionDocument, setExecutionDocument] = useState();
+  const [executionProgressModal, setExecutionProgressModal] = useState(false);
 
   return (
-    <ExecutionContext.Provider value={{ form, setForm }}>
+    <ExecutionContext.Provider
+      value={{
+        form,
+        setForm,
+        executionList,
+        setExecutionList,
+        executionDocument,
+        setExecutionDocument,
+        executionProgressModal,
+        setExecutionProgressModal,
+      }}
+    >
       {children}
     </ExecutionContext.Provider>
   );

@@ -17,7 +17,6 @@ function RegulationLibrary() {
     status: "all",
     sort: "newest",
   });
-
   const [page, setPage] = useState(1);
   const limit = 20;
 
@@ -28,7 +27,6 @@ function RegulationLibrary() {
     setRegulationList,
   } = useRegulationContext();
 
-  // ✅ API fetch with params
   const fetchRegulationsList = async () => {
     const res = await fetchRegulationListApi({
       status: filters.status === "all" ? undefined : filters.status,
@@ -37,19 +35,14 @@ function RegulationLibrary() {
     });
 
     setRegulationList(res?.data?.regulations || []);
-    // if backend gives total/pages, store it here too (optional)
   };
 
-  // ✅ refetch when API params change
   useEffect(() => {
     fetchRegulationsList();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters.status, page]);
 
   const handleFilterChange = (e) => {
     const { name, value } = e.target;
-
-    // ✅ if status changes, reset to page 1
     if (name === "status") setPage(1);
 
     setFilters((prev) => ({ ...prev, [name]: value }));
@@ -65,11 +58,9 @@ function RegulationLibrary() {
     }
   };
 
-  // ✅ Client-side search + sort (not in Swagger params)
   const filteredRegulations = useMemo(() => {
     const list = Array.isArray(regulationList) ? [...regulationList] : [];
 
-    // Search
     const q = filters.search.trim().toLowerCase();
     const searched = !q
       ? list
@@ -80,7 +71,6 @@ function RegulationLibrary() {
           return title.includes(q) || version.includes(q) || status.includes(q);
         });
 
-    // Sort
     searched.sort((a, b) => {
       const aTime = a?.uploaded_at ? new Date(a.uploaded_at).getTime() : 0;
       const bTime = b?.uploaded_at ? new Date(b.uploaded_at).getTime() : 0;

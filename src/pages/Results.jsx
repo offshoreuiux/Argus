@@ -1,5 +1,4 @@
 import React from "react";
-import Card from "../components/common/Card";
 import ExecutionSummary from "../components/results/ExecutionSummary";
 import ControlResults from "../components/results/ControlResults";
 
