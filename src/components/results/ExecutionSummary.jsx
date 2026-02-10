@@ -39,10 +39,10 @@ function ExecutionSummary({ onDownload, onExport, onAuditTrail }) {
     }
   };
 
-  useEffect(() => {
-    fetchObligationList();
-    executionSummary();
-  }, []);
+  // useEffect(() => {
+  //   fetchObligationList();
+  //   executionSummary();
+  // }, []);
 
   const statsArr = [
     { label: "Institution", value: "Bank A" },

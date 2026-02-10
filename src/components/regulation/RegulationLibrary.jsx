@@ -1,41 +1,23 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo } from "react";
 import Card from "../common/Card";
 import StatusBadge from "../common/StatusBadge";
 import InputField from "../common/InputField";
 import SelectField from "../common/SelectField";
 import Table from "../common/Table";
 import { useRegulationContext } from "../../contexts/RegulationContext";
-import {
-  fetchRegulationListApi,
-  fetchSingleRegulationsApi,
-} from "../../../connections/apis/regulation/regulation";
+import { fetchSingleRegulationsApi } from "../../../connections/apis/regulation/regulation";
 import { formatDateDMY } from "../../../helper";
 
-function RegulationLibrary() {
-  const [filters, setFilters] = useState({
-    search: "",
-    status: "all",
-    sort: "newest",
-  });
-  const [page, setPage] = useState(1);
-  const limit = 20;
-
-  const {
-    setRegulationModal,
-    setRegulationDocument,
-    regulationList,
-    setRegulationList,
-  } = useRegulationContext();
-
-  const fetchRegulationsList = async () => {
-    const res = await fetchRegulationListApi({
-      status: filters.status === "all" ? undefined : filters.status,
-      page,
-      limit,
-    });
-
-    setRegulationList(res?.data?.regulations || []);
-  };
+function RegulationLibrary({
+  fetchRegulationsList,
+  filters,
+  setFilters,
+  page,
+  setPage,
+  limit,
+}) {
+  const { setRegulationModal, setRegulationDocument, regulationList } =
+    useRegulationContext();
 
   useEffect(() => {
     fetchRegulationsList();

@@ -5,7 +5,7 @@ import { useMappingContext } from "../contexts/MappingContext";
 import MappingWizard from "../components/mapping/MappingWizard";
 
 function MappingEditor() {
-  const { create, setCreate } = useMappingContext();
+  const { create, setCreate, setEditingId, setMode } = useMappingContext();
 
   return (
     <div className="h-screen p-[24px] flex flex-col gap-6">
@@ -22,7 +22,13 @@ function MappingEditor() {
           </p>
         </div>
         {!create && (
-          <PrimaryButton onClick={() => setCreate(true)}>
+          <PrimaryButton
+            onClick={() => {
+              setCreate(true);
+              setMode("create");
+              setEditingId(null);
+            }}
+          >
             + Create Mapping
           </PrimaryButton>
         )}

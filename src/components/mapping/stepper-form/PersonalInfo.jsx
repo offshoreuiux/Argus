@@ -28,8 +28,8 @@ const cardsArr = [
 function PersonalInfo() {
   const { wizard, updateWizard } = useMappingContext();
   const selectedCards = useMemo(
-    () => (wizard.control_pattern_id ? [wizard.control_pattern_id] : []),
-    [wizard.control_pattern_id],
+    () => (wizard?.control_pattern_id ? [wizard?.control_pattern_id] : []),
+    [wizard?.control_pattern_id],
   );
 
   const toggle = (id) => {

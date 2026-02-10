@@ -80,3 +80,35 @@ export const deactivateMappingApi = (mapping_id, reason = "") => {
     },
   });
 };
+
+export const activateMappingApi = (mapping_id) => {
+  if (!mapping_id) throw new Error("mapping_id is required");
+
+  // ✅ correct: second arg is data (can be {}), third arg is config
+  return apiURL.post(
+    `mappings/${mapping_id}/activate`,
+    {},
+    {
+      headers: { "Content-Type": "application/json" },
+    },
+  );
+};
+export const validateMappingApi = (mapping_id) => {
+  if (!mapping_id) throw new Error("mapping_id is required");
+
+  return apiURL.post(
+    `mappings/${mapping_id}/validate`,
+    {},
+    {
+      headers: { "Content-Type": "application/json" },
+    },
+  );
+};
+
+export const mappingTestApi = (mapping_id, payload) => {
+  if (!mapping_id) throw new Error("mapping_id is required");
+
+  return apiURL.post(`mappings/${mapping_id}/test`, payload, {
+    headers: { "Content-Type": "application/json" },
+  });
+};

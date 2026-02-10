@@ -8,6 +8,7 @@ import OutlinedButton from "../common/OutlinedButton";
 import { useResultsContext } from "../../contexts/ResultsContext";
 import ExceptionManagementModal from "./modal/ExceptionModal";
 import HistoricalTrendModal from "./modal/HistoricalTrendModal";
+import { fetchExceptionsListApi } from "../../../connections/apis/results/results";
 
 const apiMock = [
   {
@@ -63,7 +64,17 @@ function ControlResults() {
   } = useResultsContext();
   const [selectedItem, setSelectedItem] = useState(null);
 
+  const fetchExceptionsList = async () => {
+    try {
+      const res = await fetchExceptionsListApi();
+      console.log("res", res.data?.exceptions);
+    } catch (error) {
+      console.log("error", error);
+    }
+  };
+
   useEffect(() => {
+    fetchExceptionsList();
     setRows(apiMock);
   }, []);
 

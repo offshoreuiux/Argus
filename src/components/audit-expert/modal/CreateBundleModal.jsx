@@ -8,6 +8,7 @@ import CheckboxInput from "../../common/CheckboxInput";
 import RadioInput from "../../common/RadioInput";
 import TextareaField from "../../common/TextareaField";
 import { createAuditBundleApi } from "../../../../connections/apis/audit/audit";
+import { useAuditExportContext } from "../../../contexts/AuditExportContext";
 
 const REGULATION_IDS_MAP = {
   gdpr: "GDPR",
@@ -17,6 +18,7 @@ const REGULATION_IDS_MAP = {
 };
 
 export default function CreateBundleModal({ isOpen, onClose, onSubmit }) {
+  const { triggerAuditListRefresh } = useAuditExportContext();
   const [form, setForm] = useState({
     bundleName: "",
     institution: "DEMO_BANK",
@@ -39,7 +41,7 @@ export default function CreateBundleModal({ isOpen, onClose, onSubmit }) {
       traceabilityMatrix: false,
     },
 
-    exportFormat: "", // "pdf" | "excel" | "zip"  (backend doesn't need this yet)
+    exportFormat: "", // "pdf" | "excel" | "zip"  (backend doesn't need this yet) 
     notes: "",
   });
 
@@ -116,7 +118,7 @@ export default function CreateBundleModal({ isOpen, onClose, onSubmit }) {
 
       setLoading(true);
 
-      // ✅ Map your UI include fields to backend booleans
+      // ✅ Map your UI include fields to backend booleans 
       // Backend expects: include_obligations, include_mappings, include_executions, include_audit_events
       // (Your UI has more granular checkboxes; we map them sensibly)
       const include_executions =
@@ -140,6 +142,8 @@ export default function CreateBundleModal({ isOpen, onClose, onSubmit }) {
       };
 
       const res = await createAuditBundleApi(payload);
+
+      triggerAuditListRefresh();
 
       // ✅ callback to parent if you need
       onSubmit?.({ uiForm: form, apiPayload: payload, response: res?.data });

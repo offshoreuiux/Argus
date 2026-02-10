@@ -21,7 +21,7 @@ const ALLOWED_TYPES = [
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 ];
 
-function UploadRegulation() {
+function UploadRegulation({ fetchRegulationsList }) {
   const { showToast } = useToast();
   const [formData, setFormData] = useState({
     document: null,
@@ -131,6 +131,7 @@ function UploadRegulation() {
         effectiveDate: "",
         primaryArticles: "",
       });
+      fetchRegulationsList();
     } catch (err) {
       console.log("upload/normalize/extract err", err);
       showToast(

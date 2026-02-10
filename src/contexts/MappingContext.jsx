@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState } from "react";
+import { DEFAULT_WIZARD } from "../../helper";
 
 const MappingContext = createContext(null);
 
@@ -15,26 +16,9 @@ function MappingProvider({ children }) {
   const [mode, setMode] = useState("create"); // "create" | "edit"
   const [editingId, setEditingId] = useState(null);
   const [mappingList, setMappingList] = useState();
+  const [datasetList, setDatasetList] = useState([]);
 
   // extend wizard defaults
-  const DEFAULT_WIZARD = {
-    obligation_id: "",
-    control_pattern_id: null,
-    data_source: {
-      dataset: "",
-      aggregation: "SUM",
-      filter_column: "",
-      filter_value: "",
-    },
-    validation: {
-      metricField: "severity",
-      thresholdValue: "",
-      operator: "gt",
-    },
-    execution_frequency: "daily",
-    priority: "low",
-  };
-
   const [wizard, setWizard] = useState(DEFAULT_WIZARD);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState("");
@@ -64,6 +48,8 @@ function MappingProvider({ children }) {
         setEditingId,
         updateWizard,
         resetWizard,
+        datasetList,
+        setDatasetList,
       }}
     >
       {children}

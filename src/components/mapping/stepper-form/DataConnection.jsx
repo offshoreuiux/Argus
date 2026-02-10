@@ -1,22 +1,15 @@
-import React, { useState } from "react";
+import { useEffect } from "react";
 import InputField from "../../common/InputField";
-import SelectField from "../../common/SelectField";
 import { useMappingContext } from "../../../contexts/MappingContext";
-
-const tableArr = [
-  { label: "Processing Log", value: "processing_log" },
-  { label: "PIA Database", value: "pia_database" },
-  { label: "Incident Log", value: "incident_log" },
-  { label: "Encryption Audit", value: "encryption_audit" },
-];
+import { fetchDataSetsApi } from "../../../../connections/apis/api";
 
 function DataConnection() {
-  const { wizard, updateWizard } = useMappingContext();
+  const { wizard, updateWizard, datasetList, setDatasetList } =
+    useMappingContext();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
 
-    // map your inputs to the structure backend expects
     if (name === "table") {
       updateWizard({
         data_source: {
@@ -27,9 +20,6 @@ function DataConnection() {
     }
 
     if (name === "filterCondition") {
-      // if you want to keep it simple, store raw string,
-      // or parse it into filter_column/filter_value if you can.
-      // Here’s a simple approach: store raw string as filter_value.
       updateWizard({
         data_source: {
           ...wizard.data_source,
@@ -38,6 +28,19 @@ function DataConnection() {
       });
     }
   };
+
+  const fetchDataSets = async () => {
+    try {
+      const res = await fetchDataSetsApi();
+      setDatasetList(res.data?.datasets);
+    } catch (error) {
+      console.log("error", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchDataSets();
+  }, []);
 
   return (
     <div className="p-6 flex flex-col gap-5">
@@ -52,15 +55,29 @@ function DataConnection() {
       </div>
 
       <div className="grid grid-cols-2 gap-4">
-        <SelectField
-          labelTitle="Select Table"
-          required
-          name="table"
-          value={wizard.data_source.dataset}
-          handleChange={handleChange}
-          placeholder="Select a table"
-          options={tableArr}
-        />
+        <div className="flex flex-col gap-1">
+          <label className="text-sm font-medium text-[#242424]">
+            Select Table
+          </label>
+          <select
+            name="table"
+            value={wizard.data_source.dataset}
+            onChange={handleChange}
+            className="
+                  w-full h-[46px] px-3 rounded-lg text-sm
+                  border border-[#E2E8EF] bg-[#F9FBFD]
+                  outline-none transition
+                  focus:border-teal-500
+                  disabled:bg-gray-100 disabled:cursor-not-allowed"
+          >
+            <option value="">Select pattern</option>
+            {datasetList.map((item) => (
+              <option key={item.name} value={item.table}>
+                {item.name?.split("_")?.join(" ")}
+              </option>
+            ))}
+          </select>
+        </div>
 
         <InputField
           labelTitle="Filter Conditions (Optional)"

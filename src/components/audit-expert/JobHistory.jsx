@@ -78,6 +78,7 @@ export default function JobHistory() {
     selectedBundle,
     setSelectedBundle,
     auditList,
+    auditListRefreshKey,
     setAuditList,
   } = useAuditExportContext();
   const [downloadingId, setDownloadingId] = useState(null);
@@ -125,7 +126,7 @@ export default function JobHistory() {
 
   useEffect(() => {
     fetchAuditList();
-  }, []);
+  }, [auditListRefreshKey]);
 
   useEffect(() => {
     fetchAuditList();

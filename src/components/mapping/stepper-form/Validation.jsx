@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import InputField from "../../common/InputField";
 import SelectField from "../../common/SelectField";
 import RadioInput from "../../common/RadioInput";
 import { useMappingContext } from "../../../contexts/MappingContext";
+import { mappingTestApi } from "../../../../connections/apis/mapping/mapping";
 
 const metricOptions = [
   { label: "Severity", value: "severity" },
@@ -19,13 +20,15 @@ const operators = [
 ];
 
 function Validation() {
-  const { wizard, updateWizard } = useMappingContext();
+  const { wizard, updateWizard, mode, editingId } = useMappingContext();
 
-  // local test-only state (doesn't need to be in context)
   const [test, setTest] = useState({
     testValue: "152",
     expectedResult: "",
   });
+
+  const [testLoading, setTestLoading] = useState(false);
+  const [testError, setTestError] = useState(""); // ✅ new
 
   const handleValidationChange = (e) => {
     const { name, value } = e.target;
@@ -39,7 +42,7 @@ function Validation() {
     setTest((prev) => ({ ...prev, [name]: value }));
   };
 
-  const runTest = () => {
+  const runLocalTest = () => {
     const thresholdRaw = wizard?.validation?.thresholdValue ?? "";
     const operator = wizard?.validation?.operator ?? "gt";
 
@@ -53,7 +56,6 @@ function Validation() {
       }));
       return;
     }
-
     if (test.testValue === "" || Number.isNaN(testVal)) {
       setTest((p) => ({ ...p, expectedResult: "Enter a valid test value" }));
       return;
@@ -66,6 +68,65 @@ function Validation() {
     if (operator === "neq") passed = testVal !== threshold;
 
     setTest((p) => ({ ...p, expectedResult: passed ? "Pass" : "Fail" }));
+  };
+
+  const runTest = async () => {
+    setTestError(""); // ✅ clear previous error
+
+    // Create mode => local test only
+    if (mode !== "edit") {
+      runLocalTest();
+      return;
+    }
+
+    const mapping_id = editingId;
+    if (!mapping_id) {
+      setTest((p) => ({ ...p, expectedResult: "Fail" }));
+      setTestError("Mapping ID not found");
+      return;
+    }
+
+    const thresholdRaw = wizard?.validation?.thresholdValue ?? "";
+    const threshold = Number(thresholdRaw);
+    const testVal = Number(test.testValue);
+
+    if (thresholdRaw === "" || Number.isNaN(threshold)) {
+      setTest((p) => ({ ...p, expectedResult: "" }));
+      setTestError("Enter a threshold value first");
+      return;
+    }
+    if (test.testValue === "" || Number.isNaN(testVal)) {
+      setTest((p) => ({ ...p, expectedResult: "" }));
+      setTestError("Enter a valid test value");
+      return;
+    }
+
+    // payload keys must match backend expectations
+    const payload = {
+      metric_field: wizard?.validation?.metricField,
+      operator: wizard?.validation?.operator ?? "gt",
+      threshold_value: thresholdRaw,
+      test_value: test.testValue,
+    };
+
+    try {
+      setTestLoading(true);
+      setTest((p) => ({ ...p, expectedResult: "" }));
+
+      const res = await mappingTestApi(mapping_id, payload);
+
+      // ✅ Your API returns these keys
+      const passed = Boolean(res?.data?.test_passed);
+      const errMsg = res?.data?.error || "";
+
+      setTest((p) => ({ ...p, expectedResult: passed ? "Pass" : "Fail" }));
+      setTestError(!passed && errMsg ? errMsg : "");
+    } catch (err) {
+      setTest((p) => ({ ...p, expectedResult: "Fail" }));
+      setTestError(err?.response?.data?.message || "Test request failed");
+    } finally {
+      setTestLoading(false);
+    }
   };
 
   return (
@@ -150,17 +211,24 @@ function Validation() {
           />
         </div>
 
+        {/* ✅ show API error */}
+        {/* {testError ? (
+          <p className="mt-3 text-[12px] text-[#EF4444]">{testError}</p>
+        ) : null} */}
+
         <button
           type="button"
           onClick={runTest}
-          className="mt-4 w-full h-[42px] rounded-lg bg-[#E9FFFB] text-[#00BDA8]
-                 border border-[#B7F1E8] flex items-center justify-center gap-2 cursor-pointer
-                 text-[13px] font-semibold hover:brightness-[0.98] active:scale-[0.99]"
+          disabled={testLoading}
+          className={`mt-4 w-full h-[42px] rounded-lg bg-[#E9FFFB] text-[#00BDA8]
+            border border-[#B7F1E8] flex items-center justify-center gap-2
+            text-[13px] font-semibold hover:brightness-[0.98] active:scale-[0.99]
+            ${testLoading ? "opacity-60 cursor-not-allowed" : "cursor-pointer"}`}
         >
           <span className="w-[24px] h-[24px] rounded-full bg-[#00D1BC] text-white flex items-center justify-center text-[12px]">
-            ▶
+            {testLoading ? "…" : "▶"}
           </span>
-          Run Test
+          {testLoading ? "Running..." : "Run Test"}
         </button>
       </div>
     </div>

@@ -1,10 +1,14 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import Modal from "../../common/Modal";
 import PrimaryButton from "../../common/PrimaryButton";
 import UploadIcon from "../../../assets/images/svg/upload-file.svg";
 import SmallDocIcon from "../../../assets/images/svg/file-check.svg";
-import { formatDateDMY } from "../../../../helper";
-import { fetchExtractedObligationsApi } from "../../../../connections/apis/regulation/regulation";
+import { formatDateDMY, formatDateTimeHistory } from "../../../../helper";
+import {
+  fetchExtractedObligationsApi,
+  fetchRegulationHistoryApi,
+} from "../../../../connections/apis/regulation/regulation";
+import StatusBadge from "../../common/StatusBadge";
 
 const tabsArr = [
   { label: "Documents", value: 1 },
@@ -15,8 +19,7 @@ const tabsArr = [
 function RegulationDocumentModal({ isOpen, onClose, document }) {
   const [activeTab, setActiveTab] = useState(tabsArr[0].value);
   const [obligationsList, setObligationsList] = useState([]);
-  console.log("document", document);
-  console.log("activeTab", activeTab);
+  const [historyList, setHistoryList] = useState([]);
 
   const fetchExtractedObligationsList = async () => {
     try {
@@ -27,91 +30,29 @@ function RegulationDocumentModal({ isOpen, onClose, document }) {
     }
   };
 
+  const fetchRegulationHistory = async () => {
+    try {
+      const res = await fetchRegulationHistoryApi(document.doc_id);
+      setHistoryList(res.data?.history);
+    } catch (error) {
+      console.log("error", error);
+    }
+  };
+
   useEffect(() => {
     if (activeTab === 2) {
       fetchExtractedObligationsList();
     }
+    if (activeTab === 3) {
+      fetchRegulationHistory();
+    }
   }, [activeTab]);
 
-  // Use API data if present, otherwise fallback demo list
-  const obligations = useMemo(() => {
-    if (Array.isArray(document?.obligations) && document.obligations.length) {
-      return document.obligations;
-    }
-    return [
-      {
-        id: 1,
-        article: "Article 1",
-        title: "Obligation 1",
-        description:
-          "Description of the regulatory obligation and its requirements...",
-        status: "Mapped",
-      },
-      {
-        id: 2,
-        article: "Article 2",
-        title: "Obligation 2",
-        description:
-          "Description of the regulatory obligation and its requirements...",
-        status: "Mapped",
-      },
-      {
-        id: 3,
-        article: "Article 3",
-        title: "Obligation 3",
-        description:
-          "Description of the regulatory obligation and its requirements...",
-        status: "Mapped",
-      },
-      {
-        id: 4,
-        article: "Article 4",
-        title: "Obligation 4",
-        description:
-          "Description of the regulatory obligation and its requirements...",
-        status: "Mapped",
-      },
-    ];
-  }, [document]);
-
-  const history = useMemo(() => {
-    if (Array.isArray(document?.history) && document.history.length) {
-      return document.history;
-    }
-
-    // fallback demo list (like screenshot)
-    return [
-      {
-        id: 1,
-        title: "Document Uploaded",
-        description: "User uploaded the regulation document",
-        dateTime: "01/10/2026 at 12:21:04",
-      },
-      {
-        id: 2,
-        title: "Analysis Completed",
-        description: "AI analysis identified all obligations",
-        dateTime: "01/10/2026 at 13:26:54",
-      },
-      {
-        id: 3,
-        title: "Status Changed",
-        description: "Status changed from Draft to Active",
-        dateTime: "01/10/2026 at 12:21:04",
-      },
-      {
-        id: 4,
-        title: "Document Reviewed",
-        description: "Compliance team reviewed the document",
-        dateTime: "01/10/2026 at 13:27:54",
-      },
-    ];
-  }, [document]);
-
-  const obligationsCount =
-    typeof document?.obligationsCount === "number"
-      ? document.obligationsCount
-      : obligations.length;
+  useEffect(() => {
+    setActiveTab(1);
+    setObligationsList([]);
+    setHistoryList([]);
+  }, [isOpen]);
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -154,20 +95,14 @@ function RegulationDocumentModal({ isOpen, onClose, document }) {
             <div className="flex items-center gap-2 bg-[#EFF6FF] border border-[#DCE7FF] rounded-lg px-4 py-3">
               <img src={SmallDocIcon} alt="" />
               <p className="text-sm text-[#1D4ED8]">
-                <span className="font-semibold">{obligationsCount}</span>{" "}
+                <span className="font-semibold">{obligationsList?.length}</span>{" "}
                 obligations identified in this regulation
               </p>
             </div>
 
             {/* Cards list */}
             <div className="flex flex-col gap-3">
-              {obligations.map((item) => {
-                const title =
-                  item?.displayTitle ||
-                  `${item?.article ? `${item.article}: ` : ""}${item?.title || "Obligation"}`;
-
-                const statusText = item?.status || "Mapped";
-
+              {obligationsList?.map((item) => {
                 return (
                   <div
                     key={item.id || `${item.article}-${item.title}`}
@@ -175,17 +110,15 @@ function RegulationDocumentModal({ isOpen, onClose, document }) {
                   >
                     <div className="min-w-0">
                       <p className="text-sm font-medium text-[#111827]">
-                        {title}
+                        {item.clause_ref}
                       </p>
                       <p className="text-sm text-[#6B7280] mt-1 truncate">
-                        {item?.description ||
+                        {item.clause_text ||
                           "Description of the regulatory obligation and its requirements..."}
                       </p>
                     </div>
 
-                    <span className="shrink-0 bg-[#DFFFE9] text-[#15803D] text-xs font-medium px-3 py-1 rounded-full">
-                      {statusText}
-                    </span>
+                    <StatusBadge status={item?.status} />
                   </div>
                 );
               })}
@@ -197,14 +130,12 @@ function RegulationDocumentModal({ isOpen, onClose, document }) {
         return (
           <div className="px-4 pb-4">
             <div className="relative flex flex-col gap-2">
-              {history.map((item, index) => {
-                const isLast = index === history.length - 1;
+              {historyList?.map((item, index) => {
+                const isLast = index === historyList.length - 1;
 
                 return (
                   <div key={item.id || index} className="relative flex gap-5">
-                    {/* Left: icon + vertical line */}
                     <div className="relative flex flex-col items-center">
-                      {/* Check icon */}
                       <div className="h-7 w-7 rounded-full bg-[#00D1BC] flex items-center justify-center shrink-0">
                         <svg
                           width="18"
@@ -231,14 +162,14 @@ function RegulationDocumentModal({ isOpen, onClose, document }) {
                     {/* Right: text */}
                     <div className="min-w-0 mb-4">
                       <p className="text-[15px] font-medium text-[#111827]">
-                        {item.title}
+                        {item.event_type}
                       </p>
                       <div className="flex flex-col gap-1 mt-1">
                         <p className="text-sm text-[#6B7280]">
-                          {item.description}
+                          {item?.description}
                         </p>
                         <p className="text-xs text-[#9CA3AF]">
-                          {item.dateTime}
+                          {formatDateTimeHistory(item.timestamp)}
                         </p>
                       </div>
                     </div>

@@ -18,7 +18,7 @@ import { formatDateTime } from "../../../helper";
 const STATUS_OPTIONS = [
   { label: "Active", value: "active" },
   { label: "Inactive", value: "inactive" },
-  { label: "Draft", value: "draft" },
+  // { label: "Draft", value: "draft" },
 ];
 
 const CONF_OPTIONS = [
@@ -284,12 +284,16 @@ function MappingList() {
               </div>
             </td>
             <td className="p-3 text-[#434343]">{item.controlPattern || "-"}</td>
-            <td className="p-3 text-[#434343]">{item.dataSource || "-"}</td>
+            <td className="p-3 text-[#434343]">
+              {item.concept_mappings.threshold_check.dataset
+                ?.split("_")
+                ?.join(" ") || "-"}
+            </td>
             <td className="p-3">
               <PriorityText priority={item.priority} />
             </td>
             <td className="p-3 text-[#434343]">
-              {formatDateTime(item.deactivated_at) || "-"}
+              {formatDateTime(item.created_at) || "-"}
             </td>
             <td className="p-3">
               <StatusBadge status={item.execution_frequency} />

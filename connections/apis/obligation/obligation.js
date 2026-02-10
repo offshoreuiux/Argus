@@ -59,7 +59,3 @@ export const approveSingleObligationApi = (obligation_id, payload) => {
     },
   });
 };
-
-export const fetchControlPatternsApi = () => {
-  return apiURL.get(`control-patterns`);
-};

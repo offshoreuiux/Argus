@@ -49,6 +49,23 @@ export const formatDuration = (duration) => {
   if (minutes === 0) return `${seconds}s`;
   return `${minutes}m ${seconds}s`;
 };
+export const formatDateTimeHistory = (isoString) => {
+  if (!isoString) return "-";
+
+  const date = new Date(isoString);
+
+  const pad = (n) => String(n).padStart(2, "0");
+
+  const day = pad(date.getDate());
+  const month = pad(date.getMonth() + 1);
+  const year = date.getFullYear();
+
+  const hours = pad(date.getHours());
+  const minutes = pad(date.getMinutes());
+  const seconds = pad(date.getSeconds());
+
+  return `${day}/${month}/${year} at ${hours}:${minutes}:${seconds}`;
+};
 
 export const normalizeConfidence = (val) => {
   if (val === null || val === undefined) return 0;
@@ -230,4 +247,22 @@ export const downloadBlobResponse = (res, fallbackName = "bundle.zip") => {
   a.remove();
 
   window.URL.revokeObjectURL(url);
+};
+
+export const DEFAULT_WIZARD = {
+  obligation_id: "",
+  control_pattern_id: null,
+  data_source: {
+    dataset: "",
+    aggregation: "SUM",
+    filter_column: "",
+    filter_value: "",
+  },
+  validation: {
+    metricField: "severity",
+    thresholdValue: "",
+    operator: "gt",
+  },
+  execution_frequency: "daily",
+  priority: "low",
 };

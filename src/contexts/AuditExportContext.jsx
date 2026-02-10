@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState } from "react";
+import React, { createContext, useCallback, useContext, useState } from "react";
 
 const AuditExportContext = createContext(null);
 
@@ -18,7 +18,11 @@ function AuditExportProvider({ children }) {
   const [createBundleModal, setCreateBundleModal] = useState(false);
   const [bundleGenModal, setBundleGenModal] = useState(false);
   const [auditList, setAuditList] = useState([]);
+  const [auditListRefreshKey, setAuditListRefreshKey] = useState(0);
 
+  const triggerAuditListRefresh = useCallback(() => {
+    setAuditListRefreshKey((k) => k + 1);
+  }, []);
   return (
     <AuditExportContext.Provider
       value={{
@@ -32,6 +36,8 @@ function AuditExportProvider({ children }) {
         setBundleGenModal,
         auditList,
         setAuditList,
+        auditListRefreshKey,
+        triggerAuditListRefresh,
       }}
     >
       {children}

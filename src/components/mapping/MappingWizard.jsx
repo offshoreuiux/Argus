@@ -1,20 +1,23 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import PersonalInfo from "./stepper-form/PersonalInfo";
 import DataConnection from "./stepper-form/DataConnection";
 import Validation from "./stepper-form/Validation";
 import Summary from "./stepper-form/Summary";
-
 import Card from "../common/Card";
 import OutlinedButton from "../common/OutlinedButton";
 import PrimaryButton from "../common/PrimaryButton";
-
 import { useMappingContext } from "../../contexts/MappingContext";
 import DotIcon from "../../assets/images/svg/dot.svg";
-
 import {
+  activateMappingApi,
   createMappingApi,
   updateMappingApi,
+  validateMappingApi,
 } from "../../../connections/apis/mapping/mapping";
+import { useToast } from "../../contexts/ToastContext";
+import { DEFAULT_WIZARD } from "../../../helper";
+import { fetchObligationListApi } from "../../../connections/apis/obligation/obligation";
+import { useObligationContext } from "../../contexts/ObligationContext";
 
 const mappingArr = [
   { title: "Personal info", description: "AI recommends control pattern" },
@@ -44,16 +47,21 @@ const CheckIcon = ({ className = "" }) => (
 
 function MappingWizard() {
   const [steps, setSteps] = useState(1);
+  const { showToast } = useToast();
   const {
+    create,
     setCreate,
     wizard,
+    setWizard,
     submitting,
     setSubmitting,
     submitError,
     setSubmitError,
     mode,
     editingId,
+    setEditingId,
   } = useMappingContext();
+  const { obligationList, setObligationList } = useObligationContext();
 
   const handlePreviousStep = () => {
     setSubmitError("");
@@ -66,6 +74,16 @@ function MappingWizard() {
     setSubmitError("");
 
     try {
+      const obligationId =
+        wizard?.obligation_id ||
+        wizard?.obligation?.id ||
+        wizard?.obligation?._id ||
+        obligationList[0]?.obligation_id;
+
+      if (mode !== "edit" && !obligationId) {
+        throw new Error("obligation_id is required");
+      }
+
       const concept_mappings = {
         threshold_check: {
           dataset: wizard?.data_source?.dataset,
@@ -73,6 +91,8 @@ function MappingWizard() {
           aggregation: wizard?.data_source?.aggregation || "SUM",
           filter_column: wizard?.data_source?.filter_column || "",
           filter_value: wizard?.data_source?.filter_value || "",
+          operator: wizard?.validation?.operator || "gt",
+          threshold: wizard?.validation?.thresholdValue,
         },
       };
 
@@ -82,25 +102,42 @@ function MappingWizard() {
         priority: wizard?.priority,
       };
 
+      let mappingId = editingId;
+
       if (mode !== "edit") {
-        await createMappingApi({
-          obligation_id: wizard?.obligation_id,
+        const createRes = await createMappingApi({
+          obligation_id: obligationId,
           ...payload,
         });
+
+        mappingId =
+          createRes?.data?.mapping_id ||
+          createRes?.data?.id ||
+          createRes?.data?._id;
+
+        if (!mappingId)
+          throw new Error("Mapping created but mapping_id not found");
       } else {
-        if (!editingId) {
+        if (!editingId)
           throw new Error(
             "editingId is missing. Please open mapping via Edit.",
           );
-        }
         await updateMappingApi(editingId, payload);
+        mappingId = editingId;
       }
 
+      await validateMappingApi(mappingId);
+      await activateMappingApi(mappingId);
+
+      showToast("Mapping activated successfully", "", "success");
       setCreate(false);
     } catch (e) {
-      setSubmitError(
-        e?.response?.data?.message || e?.message || "Failed to submit mapping",
-      );
+      const msg =
+        e?.response?.data?.message ||
+        e?.message ||
+        "Failed to activate mapping";
+
+      showToast("Mapping Failed", msg, "error");
     } finally {
       setSubmitting(false);
     }
@@ -109,23 +146,21 @@ function MappingWizard() {
   const handleNextStep = async () => {
     setSubmitError("");
 
-    // ✅ simple per-step validation (optional but recommended)
     if (steps === 1 && !wizard?.control_pattern_id) {
-      setSubmitError("Please select a control pattern.");
+      showToast("Error", "Please select a control pattern.", "error");
       return;
     }
 
     if (steps === 2 && !wizard?.data_source?.dataset) {
-      setSubmitError("Please select a table.");
+      showToast("Error", "Please select a table.", "error");
       return;
     }
 
     if (steps === 3 && !wizard?.validation?.thresholdValue) {
-      setSubmitError("Please enter a threshold value.");
+      showToast("Error", "Please enter a threshold value.", "error");
       return;
     }
 
-    // ✅ final step => call API
     if (steps === 4) {
       await submitMapping();
       return;
@@ -196,6 +231,26 @@ function MappingWizard() {
       ? "bg-[#EEFFF3] border border-[#92D0A8]"
       : "bg-[#EFF6FF] border border-[#CBDDF4]";
   };
+
+  useEffect(() => {
+    if (mode === "create") {
+      setEditingId(null);
+      setWizard(DEFAULT_WIZARD);
+    }
+  }, [mode, create]);
+
+  const fetchObligationList = async () => {
+    try {
+      const res = await fetchObligationListApi();
+      setObligationList(res.data?.obligations);
+    } catch (error) {
+      console.log("error", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchObligationList();
+  }, []);
 
   return (
     <div>

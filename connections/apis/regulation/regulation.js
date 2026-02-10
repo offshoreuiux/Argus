@@ -80,3 +80,16 @@ export const fetchExtractedObligationsApi = (doc_id) => {
     },
   });
 };
+
+
+export const fetchRegulationHistoryApi = (doc_id) => {
+  if (!doc_id) {
+    throw new Error("doc_id is required");
+  }
+
+  return apiURL.get(`regulations/${doc_id}/history`, {
+    headers: {
+      Accept: "application/json",
+    },
+  });
+};

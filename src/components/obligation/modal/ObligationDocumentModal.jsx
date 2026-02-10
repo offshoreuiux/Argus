@@ -6,11 +6,9 @@ import TextareaField from "../../common/TextareaField";
 import OutlinedButton from "../../common/OutlinedButton";
 import PrimaryButton from "../../common/PrimaryButton";
 import RadioInput from "../../common/RadioInput";
-import {
-  approveSingleObligationApi,
-  fetchControlPatternsApi,
-} from "../../../../connections/apis/obligation/obligation";
+import { approveSingleObligationApi } from "../../../../connections/apis/obligation/obligation";
 import { obligationToForm } from "../../../../helper";
+import { fetchControlPatternsApi } from "../../../../connections/apis/api";
 
 const TRIGGER_TYPES = [
   { label: "Organization Wide", value: "org_wide" },
@@ -23,13 +21,6 @@ const ENTITY_SCOPE_OPTIONS = [
   { label: "Organization Wide", value: "organization_wide" },
   { label: "Department Level", value: "department_level" },
   { label: "Specific Process", value: "specific_process" },
-];
-
-const CONTROL_PATTERN_OPTIONS = [
-  { label: "Automated Workflow", value: "automated_workflow" },
-  { label: "Threshold Check", value: "threshold_check" },
-  { label: "Formula Check", value: "formula_check" },
-  { label: "TimeLiness Check", value: "timeLiness_check" },
 ];
 
 function ObligationReviewModal({
