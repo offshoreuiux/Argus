@@ -198,10 +198,10 @@ export default function ExceptionManagementModal({
       </div>
 
       <div className="px-6 py-4 border-t border-[#E2E8EF] flex items-center justify-end gap-3">
-        <OutlinedButton onClick={onClose} className="min-w-[100px]">
+        <OutlinedButton onClick={onClose} className="min-w-25">
           Cancel
         </OutlinedButton>
-        <PrimaryButton onClick={handleSubmit} className="min-w-[140px]">
+        <PrimaryButton onClick={handleSubmit} className="min-w-35">
           Submit Decision
         </PrimaryButton>
       </div>

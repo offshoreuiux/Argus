@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import UploadRegulation from "../components/regulation/UploadRegulation";
 import RegulationLibrary from "../components/regulation/RegulationLibrary";
 import { useRegulationContext } from "../contexts/RegulationContext";
@@ -31,7 +31,7 @@ function RegulationIngestion() {
   };
 
   return (
-    <div className="h-screen p-[24px] flex flex-col gap-6">
+    <div className="h-screen p-6 flex flex-col gap-6">
       {/* Header */}
       <div>
         <p className="text-[24px] font-bold text-[#242424]">
@@ -44,7 +44,7 @@ function RegulationIngestion() {
       </div>
 
       <div className="flex gap-6 items-start">
-        <div className="w-[550px]">
+        <div className="w-137.5">
           <UploadRegulation fetchRegulationsList={fetchRegulationsList} />
         </div>
         <div className="flex-1">

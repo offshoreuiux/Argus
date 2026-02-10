@@ -113,7 +113,7 @@ function ObligationReviewModal({
       status={document?.status}
     >
       <div className="w-full">
-        <div className="max-h-[500px] overflow-y-auto pr-1">
+        <div className="max-h-125 overflow-y-auto pr-1">
           <div className="py-4 flex flex-col gap-4">
             <InputField
               labelTitle="Original Clause"
@@ -173,7 +173,7 @@ function ObligationReviewModal({
                 name="parameters"
                 value={form.parameters}
                 onChange={handleChange}
-                className="w-full h-[110px] rounded-lg border border-[#E5E7EB] p-3 text-sm text-white bg-gradient-to-r from-[#1F2A44] to-[#2B2F55] outline-none"
+                className="w-full h-27.5 rounded-lg border border-[#E5E7EB] p-3 text-sm text-white bg-linear-to-r from-[#1F2A44] to-[#2B2F55] outline-none"
               />
             </div>
 
@@ -194,7 +194,7 @@ function ObligationReviewModal({
                 value={form.controlPattern}
                 onChange={handleChange}
                 className="
-                  w-full h-[46px] px-3 rounded-lg text-sm
+                  w-full h-11.5 px-3 rounded-lg text-sm
                   border border-[#E2E8EF] bg-[#F9FBFD]
                   outline-none transition
                   focus:border-teal-500
@@ -232,12 +232,12 @@ function ObligationReviewModal({
         </div>
 
         <div className="flex justify-end gap-3 pt-4 border-t border-[#EAEAEA]">
-          <OutlinedButton className="min-w-[110px]" onClick={onClose}>
+          <OutlinedButton className="min-w-27.5" onClick={onClose}>
             Cancel
           </OutlinedButton>
 
           <PrimaryButton
-            className="min-w-[110px]"
+            className="min-w-27.5"
             onClick={handleApprove}
             disabled={saving}
             loading={saving}

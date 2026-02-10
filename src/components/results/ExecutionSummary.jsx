@@ -58,7 +58,7 @@ function ExecutionSummary({ onDownload, onExport, onAuditTrail }) {
   ];
 
   return (
-    <Card className="!p-0 border border-[#CFE9FF]">
+    <Card className="p-0! border border-[#CFE9FF]">
       <div className="p-5">
         <p className="text-[20px] font-bold text-[#242424]">
           Execution Summary
@@ -98,7 +98,7 @@ function ExecutionSummary({ onDownload, onExport, onAuditTrail }) {
         <div className="mt-4 flex items-center gap-3">
           <PrimaryButton
             onClick={onDownload}
-            className="flex items-center gap-1 h-[40px] !text-[14px]"
+            className="flex items-center gap-1 h-10 text-[14px]!"
           >
             <img src={DownloadIcon} alt="" />
             Download Full Report
@@ -106,7 +106,7 @@ function ExecutionSummary({ onDownload, onExport, onAuditTrail }) {
 
           <OutlinedButton
             onClick={onExport}
-            className="!text-[#00D1BC] !border-[#00D1BC] flex items-center gap-1 h-[40px] !text-[14px]"
+            className="text-[#00D1BC]! border-[#00D1BC]! flex items-center gap-1 h-10 text-[14px]!"
           >
             <img src={ExcelIcon} alt="" />
             Export to Excel
@@ -114,7 +114,7 @@ function ExecutionSummary({ onDownload, onExport, onAuditTrail }) {
 
           <OutlinedButton
             onClick={onAuditTrail}
-            className="flex items-center gap-1 h-[40px] !text-[14px]"
+            className="flex items-center gap-1 h-10 text-[14px]!"
           >
             <img src={DocumentIcon} alt="" />
             View Audit Trail

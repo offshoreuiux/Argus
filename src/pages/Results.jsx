@@ -1,10 +1,9 @@
-import React from "react";
 import ExecutionSummary from "../components/results/ExecutionSummary";
 import ControlResults from "../components/results/ControlResults";
 
 function Results() {
   return (
-    <div className="h-screen p-[24px] flex flex-col gap-6">
+    <div className="h-screen p-6 flex flex-col gap-6">
       <div>
         <p className="text-[24px] font-bold text-[#242424]">
           Results & Exceptions

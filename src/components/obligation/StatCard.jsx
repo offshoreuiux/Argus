@@ -6,7 +6,7 @@ function StatCard({ item }) {
 
   return (
     <div
-      className="h-[120px] p-4 rounded-lg border flex"
+      className="h-30 p-4 rounded-lg border flex"
       style={{ backgroundColor: item.bgColor, borderColor: item.borderColor }}
     >
       <div className="flex items-start justify-between w-full">

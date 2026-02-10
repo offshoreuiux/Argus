@@ -222,7 +222,7 @@ export default function JobHistory() {
 
   return (
     <>
-      <Card className="!p-0 border border-[#CFE9FF]">
+      <Card className="p-0! border border-[#CFE9FF]">
         <div className="p-5">
           <div className="flex items-center justify-between gap-3">
             <p className="text-[20px] font-bold text-[#242424]">Job History</p>
@@ -266,7 +266,7 @@ export default function JobHistory() {
 
           <div className="mt-4 overflow-x-auto">
             <div className="inline-block min-w-full align-top">
-              <div className="min-w-[1400px]">
+              <div className="min-w-350">
                 <TableAccordion
                   columns={columns}
                   rows={filteredRows}
@@ -328,7 +328,7 @@ export default function JobHistory() {
                               <img
                                 src={DownloadIcon}
                                 alt="Download Icon"
-                                className="w-[10px]"
+                                className="w-2.5"
                               />
                             }
                             text={
@@ -434,7 +434,7 @@ function ActionPill({ text, icon, onClick, disabled = false }) {
       type="button"
       onClick={onClick}
       disabled={disabled}
-      className={`h-[28px] px-3 rounded-md border border-[#CFE9FF]
+      className={`h-7 px-3 rounded-md border border-[#CFE9FF]
         bg-white text-[#00D1BC] text-[12px] font-medium flex items-center gap-2
         ${disabled ? "opacity-60 cursor-not-allowed" : "cursor-pointer"}`}
     >

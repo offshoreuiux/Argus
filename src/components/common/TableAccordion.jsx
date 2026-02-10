@@ -29,7 +29,7 @@ export default function TableAccordion({
           <div
             key={c.key}
             className={`p-3 text-[14px] font-medium text-[#606060]
-              bg-[#F0F0F0] border-b border-[#E7EEF7] border-r border-[#dbdbdb]
+              bg-[#F0F0F0] border-b border-[#E7EEF7] border-r
               ${c.headerCellClassName || ""}`}
           >
             {c.label}

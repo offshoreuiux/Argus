@@ -266,7 +266,7 @@ function MappingList() {
         {filtered?.map((item, index) => (
           <tr
             key={item.mapping_id}
-            className={`text-sm border-b border-[#F1F1F1] h-[64px]
+            className={`text-sm border-b border-[#F1F1F1] h-16
               ${index % 2 === 0 ? "bg-white" : "bg-[#F1FFFD]"}
             `}
           >
@@ -278,7 +278,7 @@ function MappingList() {
                 <span className="inline-flex text-[#00B8A9] text-xs w-fit">
                   {item.obligation_id?.split("_")?.join(" ")}
                 </span>
-                <p className="text-xs text-[#6B7280] leading-4 max-w-[260px]">
+                <p className="text-xs text-[#6B7280] leading-4 max-w-65">
                   {item.obligation_statement}
                 </p>
               </div>

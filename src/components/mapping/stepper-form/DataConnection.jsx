@@ -64,7 +64,7 @@ function DataConnection() {
             value={wizard.data_source.dataset}
             onChange={handleChange}
             className="
-                  w-full h-[46px] px-3 rounded-lg text-sm
+                  w-full h-11.5 px-3 rounded-lg text-sm
                   border border-[#E2E8EF] bg-[#F9FBFD]
                   outline-none transition
                   focus:border-teal-500
@@ -96,9 +96,9 @@ function DataConnection() {
           name="parameters"
           value={wizard.parameters}
           readOnly
-          className="w-full h-[110px] rounded-lg border border-[#E5E7EB] p-3
+          className="w-full h-27.5 rounded-lg border border-[#E5E7EB] p-3
              text-sm text-[#00D1BC]
-             bg-gradient-to-r from-[#1F2A44] to-[#2B2F55]
+             bg-linear-to-r from-[#1F2A44] to-[#2B2F55]
              outline-none resize-none"
         />
       </div>

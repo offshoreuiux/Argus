@@ -61,7 +61,7 @@ function FileUploadField({
 
       {/* ✅ UPLOADED STATE */}
       {value ? (
-        <div className="mt-1 rounded-lg bg-gradient-to-r from-[#314464] to-[#222648] px-4 py-4 flex items-center justify-between">
+        <div className="mt-1 rounded-lg bg-linear-to-r from-[#314464] to-[#222648] px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3 min-w-0">
             {/* Left icon */}
             <PdfIcon />
@@ -78,7 +78,7 @@ function FileUploadField({
             <button
               type="button"
               onClick={openPicker}
-              className="px-2 h-[32px] text-[14px] rounded-md cursor-pointer border border-[#0F8E81] text-[#00D1BC] hover:bg-teal-400/10 bg-[#E5FAF933] transition"
+              className="px-2 h-8 text-[14px] rounded-md cursor-pointer border border-[#0F8E81] text-[#00D1BC] hover:bg-teal-400/10 bg-[#E5FAF933] transition"
             >
               Change
             </button>
@@ -86,7 +86,7 @@ function FileUploadField({
             <button
               type="button"
               onClick={onRemove}
-              className="w-[32px] h-[32px] rounded-md cursor-pointer border border-[#F13E3E] text-red-400 hover:bg-red-500/10 bg-[#E4A5A54D] transition flex items-center justify-center"
+              className="w-8 h-8 rounded-md cursor-pointer border border-[#F13E3E] text-red-400 hover:bg-red-500/10 bg-[#E4A5A54D] transition flex items-center justify-center"
               aria-label="Remove file"
               title="Remove"
             >

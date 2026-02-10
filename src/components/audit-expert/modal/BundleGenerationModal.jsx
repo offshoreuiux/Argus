@@ -136,7 +136,7 @@ export default function BundleGenerationModal({
       <div className="px-6 py-4 border-t border-[#E2E8EF] flex items-center justify-end">
         <OutlinedButton
           onClick={onClose}
-          className="!text-[#E43232] !border-[#E43232] hover:!bg-[#FFF1F1] bg-[#FFEBEB]"
+          className="text-[#E43232]! border-[#E43232]! hover:bg-[#FFF1F1]! bg-[#FFEBEB]"
         >
           Cancel Generation
         </OutlinedButton>

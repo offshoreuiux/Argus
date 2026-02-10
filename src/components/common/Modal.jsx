@@ -15,7 +15,7 @@ function Modal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#00000050] backdrop-blur-xs">
-      <div className={`bg-white rounded-2xl w-[600px] max-w-full shadow-lg overflow-hidden ${modalClassName}`}>
+      <div className={`bg-white rounded-2xl w-150 max-w-full shadow-lg overflow-hidden ${modalClassName}`}>
         {/* Header */}
         <div
           className="flex justify-between items-start px-6 py-4"

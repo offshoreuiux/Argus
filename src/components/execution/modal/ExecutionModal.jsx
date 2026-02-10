@@ -276,7 +276,7 @@ export default function ExecutionModal({ isOpen, onClose, onMinimize }) {
 
 function StatTile({ label, value, icon }) {
   return (
-    <div className="flex-1 max-w-[169px] bg-[#EFF6FF] border border-[#CBDDF4] rounded-lg p-4">
+    <div className="flex-1 max-w-42.25 bg-[#EFF6FF] border border-[#CBDDF4] rounded-lg p-4">
       <p className="text-[14px] text-[#7E7E7E]">{label}</p>
       <div className="flex items-center gap-2 mt-1">
         {icon ? <span className="text-[#7E7E7E]">{icon}</span> : null}
@@ -378,7 +378,7 @@ function ExecutionStepCard({ title, status, duration, progress = 0 }) {
       </div>
 
       {isInProgress ? (
-        <div className="mt-3 h-[8px] bg-[#DCE5EE] rounded-full overflow-hidden">
+        <div className="mt-3 h-2 bg-[#DCE5EE] rounded-full overflow-hidden">
           <div
             className="h-full bg-[#00D1BC] rounded-full"
             style={{ width: `${safeProgress}%` }}
@@ -437,7 +437,7 @@ function ExecutionResultCard({ obligationId, status, errorMessage }) {
           </p>
 
           {errorMessage ? (
-            <p className="text-[12px] text-[#B42318] mt-2 break-words">
+            <p className="text-[12px] text-[#B42318] mt-2 wrap-break-word">
               {errorMessage}
             </p>
           ) : null}

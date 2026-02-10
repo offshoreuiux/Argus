@@ -161,7 +161,7 @@ function UploadRegulation({ fetchRegulationsList }) {
   };
 
   return (
-    <Card className="max-w-[520px]">
+    <Card className="max-w-130">
       <p className="text-[20px] font-bold text-[#242424] mb-4">
         Upload New Regulation
       </p>

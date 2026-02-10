@@ -120,10 +120,10 @@ function Summary() {
           </div>
 
           {/* Dark success banner */}
-          <div className="rounded-lg border border-[#23304A] bg-gradient-to-r from-[#0F1E3A] to-[#162A4B] p-4">
+          <div className="rounded-lg border border-[#23304A] bg-linear-to-r from-[#0F1E3A] to-[#162A4B] p-4">
             <div className="flex items-center gap-3">
               <span className="w-6 h-6 rounded-full bg-[#0B2E2A] flex items-center justify-center">
-                <CheckIcon className="text-[#00D1BC] w-[30px] h-[30px]" />
+                <CheckIcon className="text-[#00D1BC] w-7.5 h-7.5" />
               </span>
               <p className="text-[16px] text-white">
                 All validation checks passed. This mapping is ready to activate.
@@ -144,7 +144,7 @@ function Summary() {
               className="rounded-lg border border-[#B9ECDB] bg-[#E6F7F2] px-4 py-3 flex items-center gap-3"
             >
               <span className="w-6 h-6 rounded-full flex items-center justify-center">
-                <CheckIcon className="text-[#00D1BC] w-[20px] h-[20px]" />
+                <CheckIcon className="text-[#00D1BC] w-5 h-5" />
               </span>
               <p className="text-[12px] text-[#111827]">{txt}</p>
             </div>

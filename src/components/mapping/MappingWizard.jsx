@@ -175,7 +175,7 @@ function MappingWizard() {
 
     if (isCompleted) {
       return (
-        <div className="w-[40px] h-[40px] rounded-full bg-[#00D1BC] flex items-center justify-center">
+        <div className="w-10 h-10 rounded-full bg-[#00D1BC] flex items-center justify-center">
           <CheckIcon className="text-white" />
         </div>
       );
@@ -183,15 +183,15 @@ function MappingWizard() {
 
     if (isCurrent) {
       return (
-        <div className="w-[40px] h-[40px] rounded-full border-2 border-[#00D1BC] flex items-center justify-center">
-          <span className="block w-[14px] h-[14px] rounded-full bg-[#00D1BC]" />
+        <div className="w-10 h-10 rounded-full border-2 border-[#00D1BC] flex items-center justify-center">
+          <span className="block w-3.5 h-3.5 rounded-full bg-[#00D1BC]" />
         </div>
       );
     }
 
     return (
-      <div className="w-[40px] h-[40px] rounded-full border-2 border-[#CBD5E1] flex items-center justify-center">
-        <div className="w-[16px] h-[16px] rounded-full bg-transparent" />
+      <div className="w-10 h-10 rounded-full border-2 border-[#CBD5E1] flex items-center justify-center">
+        <div className="w-4 h-4 rounded-full bg-transparent" />
       </div>
     );
   };
@@ -201,7 +201,7 @@ function MappingWizard() {
 
     return (
       <div
-        className={`h-[4px] w-[220px] rounded-full ${
+        className={`h-1 w-55 rounded-full ${
           isGreen ? "bg-[#00D1BC]" : "bg-[#E2E8EF]"
         }`}
       />
@@ -214,8 +214,8 @@ function MappingWizard() {
 
     if (isCompleted) {
       return (
-        <span className="w-[25px] h-[25px] rounded-full bg-[#E9FFFB] text-[#00D1BC] flex items-center justify-center">
-          <CheckIcon className="w-[20px] h-[20px]" />
+        <span className="w-6.25 h-6.25 rounded-full bg-[#E9FFFB] text-[#00D1BC] flex items-center justify-center">
+          <CheckIcon className="w-5 h-5" />
         </span>
       );
     }
@@ -290,7 +290,7 @@ function MappingWizard() {
       </div>
 
       {/* BODY */}
-      <Card className={"!p-0"}>
+      <Card className={"p-0!"}>
         {steps === 1 && <PersonalInfo />}
         {steps === 2 && <DataConnection />}
         {steps === 3 && <Validation />}
@@ -305,7 +305,7 @@ function MappingWizard() {
 
         <div className="p-6 bg-white flex items-center justify-between gap-4 rounded-b-2xl border-t border-[#E2E8EF]">
           <OutlinedButton
-            className="min-w-[150px]"
+            className="min-w-37.5"
             onClick={handlePreviousStep}
             disabled={submitting}
           >
@@ -313,7 +313,7 @@ function MappingWizard() {
           </OutlinedButton>
 
           <PrimaryButton
-            className="min-w-[150px]"
+            className="min-w-37.5"
             onClick={handleNextStep}
             disabled={submitting}
           >

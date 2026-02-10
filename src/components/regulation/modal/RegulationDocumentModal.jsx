@@ -72,13 +72,13 @@ function RegulationDocumentModal({ isOpen, onClose, document }) {
 
             {/* File Info */}
             <div className="flex gap-4 mt-5 w-full">
-              <div className="bg-[#EFF6FF] h-[85px] border border-[#DCE7FF] px-4 py-2 rounded-lg flex-1">
+              <div className="bg-[#EFF6FF] h-21.25 border border-[#DCE7FF] px-4 py-2 rounded-lg flex-1">
                 <p className="text-xs text-gray-500">FILE SIZE</p>
                 <p className="text-gray-800 font-medium">
                   {document?.size || "2.4 MB"}
                 </p>
               </div>
-              <div className="bg-[#EDFFFD] h-[85px] border border-[#CDFFFA] px-4 py-2 rounded-lg flex-1">
+              <div className="bg-[#EDFFFD] h-21.25 border border-[#CDFFFA] px-4 py-2 rounded-lg flex-1">
                 <p className="text-xs text-gray-500">DATE</p>
                 <p className="text-gray-800 font-medium">
                   {formatDateDMY(document?.uploaded_at) || "2026-01-10"}
@@ -155,7 +155,7 @@ function RegulationDocumentModal({ isOpen, onClose, document }) {
 
                       {/* Vertical line */}
                       {!isLast && (
-                        <div className="w-[2px] flex-1 bg-[#D9E2EF] mt-2" />
+                        <div className="w-0.5 flex-1 bg-[#D9E2EF] mt-2" />
                       )}
                     </div>
 
@@ -194,7 +194,7 @@ function RegulationDocumentModal({ isOpen, onClose, document }) {
       status={document?.status}
     >
       {/* Match spacing + scroll */}
-      <div className="flex flex-col max-h-[500px] overflow-y-auto">
+      <div className="flex flex-col max-h-125 overflow-y-auto">
         {/* Tabs */}
         <div className="flex border-b border-[#D4D4D4]">
           {tabsArr.map((tab) => {

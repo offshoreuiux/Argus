@@ -64,7 +64,7 @@ export default function BundleSummaryModal({ isOpen, onClose, bundle }) {
         <OutlinedButton
           onClick={handleDownloadFullBundle}
           disabled={downloading}
-          className="w-full !border-[#00D1BC] !text-[#00D1BC] text-[14px] mt-5 disabled:opacity-60"
+          className="w-full border-[#00D1BC]! text-[#00D1BC]! text-[14px] mt-5 disabled:opacity-60"
         >
           <span className="flex items-center justify-center gap-2">
             <img src={DownloadIcon} alt="" />
@@ -119,5 +119,5 @@ function SummaryRow({ title, desc, className }) {
 }
 
 function Divider() {
-  return <div className="h-[1px] bg-[#E7EEF7]" />;
+  return <div className="h-px bg-[#E7EEF7]" />;
 }

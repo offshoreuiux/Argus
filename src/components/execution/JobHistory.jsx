@@ -255,7 +255,7 @@ function JobHistory() {
           <button
             type="button"
             onClick={handleRefresh}
-            className="h-[34px] px-4 rounded-lg border border-[#E2E8EF] bg-white
+            className="h-8.5 px-4 rounded-lg border border-[#E2E8EF] bg-white
                        text-[16px] text-[#7E7E7E] flex items-center cursor-pointer gap-2
                        hover:bg-[#F8FAFC] active:scale-[0.99]"
           >
@@ -267,7 +267,7 @@ function JobHistory() {
             type="button"
             onClick={handleExport}
             disabled={loading || !executionList?.length}
-            className="h-[34px] px-4 rounded-lg border border-[#B7F1E8] bg-[#E9FFFB]
+            className="h-8.5 px-4 rounded-lg border border-[#B7F1E8] bg-[#E9FFFB]
                        text-[16px] font-semibold text-[#00D1BC] flex items-center cursor-pointer gap-2
                        hover:brightness-[0.99] active:scale-[0.99]
                        disabled:opacity-60 disabled:cursor-not-allowed"

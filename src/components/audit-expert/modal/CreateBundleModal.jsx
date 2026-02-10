@@ -359,7 +359,7 @@ export default function CreateBundleModal({ isOpen, onClose, onSubmit }) {
       <div className="px-6 py-4 border-t border-[#E2E8EF] flex items-center justify-end gap-3">
         <OutlinedButton
           onClick={onClose}
-          className="min-w-[110px]"
+          className="min-w-27.5"
           disabled={loading}
         >
           Cancel
@@ -367,7 +367,7 @@ export default function CreateBundleModal({ isOpen, onClose, onSubmit }) {
 
         <PrimaryButton
           onClick={handleSubmit}
-          className="min-w-[150px]"
+          className="min-w-37.5"
           disabled={loading}
         >
           {loading ? "Generating..." : "Generate Bundle"}

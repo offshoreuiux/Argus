@@ -112,14 +112,14 @@ function ControlResults() {
 
   return (
     <>
-      <Card className="!p-0 border border-[#CFE9FF]">
+      <Card className="p-0! border border-[#CFE9FF]">
         <div className="p-5">
           <div className="flex items-center justify-between">
             <p className="text-[20px] font-bold text-[#242424]">
               Control Results
             </p>
 
-            <div className="min-w-[200px]">
+            <div className="min-w-50">
               <SelectField
                 value={filter}
                 handleChange={(e) => setFilter(e.target.value)}
@@ -226,7 +226,7 @@ function AccordionBody({ item, onOpenException, onOpenTrend }) {
       {item.status === "fail" && item.showActions ? (
         <div className="mt-4 flex gap-3">
           <button
-            className="px-4 h-[40px] rounded-lg bg-[#E43232] cursor-pointer text-white font-medium flex items-center gap-2"
+            className="px-4 h-10 rounded-lg bg-[#E43232] cursor-pointer text-white font-medium flex items-center gap-2"
             style={{ boxShadow: "0 0 22px 0 #E4323266" }}
             onClick={() => onOpenException(item)}
           >
@@ -235,7 +235,7 @@ function AccordionBody({ item, onOpenException, onOpenTrend }) {
           </button>
 
           <OutlinedButton
-            className="h-[40px] font-medium flex items-center gap-2"
+            className="h-10 font-medium flex items-center gap-2"
             onClick={() => onOpenTrend(item)}
           >
             <TrendIcon />

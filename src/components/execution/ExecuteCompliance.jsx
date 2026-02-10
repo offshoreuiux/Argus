@@ -150,7 +150,7 @@ function ExecuteCompliance() {
 
   return (
     <>
-      <Card className={"!p-0"}>
+      <Card className={"p-0!"}>
         <div className="p-6">
           <p className="text-[20px] font-bold text-[#242424]">
             Execute Compliance Check
@@ -228,7 +228,7 @@ function ExecuteCompliance() {
         <div className="px-6 py-4 border-t border-[#E2E8EF] flex items-center justify-between">
           <OutlinedButton
             onClick={handleCancel}
-            className="min-w-[150px]"
+            className="min-w-37.5"
             disabled={loadingExecute}
           >
             Cancel
@@ -236,7 +236,7 @@ function ExecuteCompliance() {
 
           <PrimaryButton
             onClick={handleExecute}
-            className="min-w-[150px]"
+            className="min-w-37.5"
             disabled={loadingExecute}
           >
             {loadingExecute ? "Executing..." : "Execute"}

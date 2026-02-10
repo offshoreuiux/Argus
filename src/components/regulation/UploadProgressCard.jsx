@@ -8,7 +8,7 @@ const UploadProgressCard = ({ progress = 0 }) => {
       className="rounded-lg bg-[#EDFFFD] p-4 flex items-center"
       style={{ boxShadow: "0 0 4px 0 #2FC0B299" }}
     >
-      <div className="w-[100px] h-[100px]">
+      <div className="w-25 h-25">
         <img src={UploadCircle} alt="" />
       </div>
 

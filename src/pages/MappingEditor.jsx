@@ -1,4 +1,3 @@
-import React from "react";
 import PrimaryButton from "../components/common/PrimaryButton";
 import MappingList from "../components/mapping/MappingList";
 import { useMappingContext } from "../contexts/MappingContext";
@@ -8,7 +7,7 @@ function MappingEditor() {
   const { create, setCreate, setEditingId, setMode } = useMappingContext();
 
   return (
-    <div className="h-screen p-[24px] flex flex-col gap-6">
+    <div className="h-screen p-6 flex flex-col gap-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>

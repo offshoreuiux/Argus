@@ -140,7 +140,7 @@ function ObligationsList() {
             <tr
               key={item.obligation_id || index}
               className={`
-              text-sm border-b border-[#F1F1F1] cursor-pointer h-[64px]
+              text-sm border-b border-[#F1F1F1] cursor-pointer h-16
               ${index % 2 === 0 ? "bg-white" : "bg-[#F1FFFD]"}
             `}
               onClick={() => handleOpenModal(item)}

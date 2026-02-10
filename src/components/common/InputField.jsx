@@ -29,7 +29,7 @@ function InputField({
         placeholder={placeholder}
         disabled={disabled}
         className={`
-          w-full h-[46px] px-3 rounded-lg text-sm
+          w-full h-11.5 px-3 rounded-lg text-sm
           border border-[#E2E8EF] bg-[#F9FBFD]
           outline-none transition
           focus:border-teal-500

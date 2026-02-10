@@ -36,7 +36,7 @@ export default function Accordion({
               className={`w-full flex items-center justify-between px-4 cursor-pointer py-3 text-left ${open ? "bg-[#E3EDF9]" : ""}`}
             >
               <div className="flex items-start gap-3 min-w-0">
-                <span className="mt-[2px]">{item.leftIcon}</span>
+                <span className="mt-0.5">{item.leftIcon}</span>
                 <div className="min-w-0">
                   <div className="flex items-center gap-2 text-[12px]">
                     <span className="text-[14px] font-medium text-[#03AF9E]">

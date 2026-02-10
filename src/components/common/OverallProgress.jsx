@@ -10,7 +10,7 @@ function OverallProgress({ value }) {
         <p className="text-[14px] font-medium text-[#434343]">{value}%</p>
       </div>
 
-      <div className="h-[8px] bg-[#DCE5EE] rounded-full mt-3 overflow-hidden">
+      <div className="h-2 bg-[#DCE5EE] rounded-full mt-3 overflow-hidden">
         <div
           className="h-full bg-[#00D1BC] rounded-full"
           style={{ width: `${value}%` }}

@@ -28,7 +28,7 @@ function CheckboxInput({
 
       {/* Custom checkbox */}
       <span
-        className={`w-[18px] h-[18px] rounded-[3px] flex items-center justify-center
+        className={`w-4.5 h-4.5 rounded-[3px] flex items-center justify-center
           border
           ${
             checked

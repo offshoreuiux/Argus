@@ -8,6 +8,6 @@ export const fetchDataSetsApi = () => {
   return apiURL.get(`datasets`);
 };
 
-export const fetchOntologyApi = () => {
-  return apiURL.get(`ontology`);
+export const fetchSemanticRegistryApi = () => {
+  return apiURL.get(`semantic-registry`);
 };

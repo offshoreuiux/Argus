@@ -31,18 +31,12 @@ function Toast({ title, message, type = "success", onClose, duration = 3000 }) {
   return (
     <div className="fixed top-6 right-6 z-50 animate-slide-in-right">
       <div
-        className={`
-          flex items-start gap-3
-          w-[420px]
-          p-4 rounded-lg border-2
-          ${current.container}
-        `}
+        className={`flex items-start gap-3 w-105 p-4 rounded-lg border-2 ${current.container}`}
       >
         {/* Icon */}
         <div
           className={`
-            flex items-center justify-center
-            w-9 h-9 rounded-md text-white text-lg font-bold
+            flex items-center justify-center w-9 h-9 rounded-md text-white text-lg font-bold
             ${current.iconBg}
           `}
         >

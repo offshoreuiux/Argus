@@ -66,11 +66,11 @@ function Sidebar({ displaySidebar, setDisplaySidebar }) {
       className={`
         fixed top-0 h-screen bg-[#0F192E] border-r border-[#4D4D64]
         transition-all duration-300
-        ${displaySidebar ? "w-[300px] p-6" : "w-[80px] p-4"}
+        ${displaySidebar ? "w-75 p-6" : "w-20 p-4"}
       `}
     >
       {/* Header */}
-      <div className="border-b border-[#4D4D64] h-[52px]">
+      <div className="border-b border-[#4D4D64] h-13">
         {displaySidebar ? (
           <img src={Logo} alt="Argus" />
         ) : (
@@ -91,7 +91,7 @@ function Sidebar({ displaySidebar, setDisplaySidebar }) {
                   onClick={() => handleNavigate(item)}
                   className={`
                     w-full flex items-center rounded-xl transition-all cursor-pointer duration-200
-                    ${displaySidebar ? "gap-3 px-4 py-3" : "justify-center h-[48px]"}
+                    ${displaySidebar ? "gap-3 px-4 py-3" : "justify-center h-12"}
                     ${isActive ? "text-[#00D1BC]" : "text-gray-400 hover:text-white"}
                   `}
                   style={{
@@ -123,7 +123,7 @@ function Sidebar({ displaySidebar, setDisplaySidebar }) {
       <button
         type="button"
         onClick={() => setDisplaySidebar((prev) => !prev)}
-        className="border-t border-[#4D4D64] w-full h-[52px] cursor-pointer"
+        className="border-t border-[#4D4D64] w-full h-13 cursor-pointer"
       >
         <div className="flex items-center justify-center gap-2 h-full">
           <img
